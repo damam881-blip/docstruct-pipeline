@@ -1,0 +1,27 @@
+[project]
+name = "universal-pdf-extraction-pipeline"
+version = "3.2.0"
+description = "Configurable EasyOCR PDF extraction with reusable JSON parameters and crop-only output modes"
+requires-python = ">=3.10"
+dependencies = [
+  "PyMuPDF>=1.24",
+  "opencv-python-headless>=4.9",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "PyYAML>=6.0",
+  "easyocr>=1.7.2",
+  "torch>=2.2",
+  "torchvision>=0.17",
+  "scikit-learn>=1.4",
+  "Pillow>=10.0",
+  "openpyxl>=3.1",
+  "python-dateutil>=2.9",
+]
+
+[project.optional-dependencies]
+paddle = ["paddleocr>=2.8"]
+test = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

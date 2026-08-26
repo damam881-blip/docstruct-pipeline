@@ -1,0 +1,1036 @@
+project.deterministic:
+  type: boolean
+  default: true
+  allowed_range: true, false
+  purpose: Enable best-effort reproducibility controls for Python, NumPy, PyTorch, and cuDNN.
+  increase: not numeric; set true when repeatability matters.
+  decrease: not numeric; set false when maximum backend freedom/performance is preferred.
+  debug_output: runtime behavior; generated run_config.json
+  resolution_dependent: false
+project.random_seed:
+  type: integer
+  default: 42
+  allowed_range: any integer
+  purpose: Seed used when project.deterministic is true.
+  increase: not a quality tuning control.
+  decrease: not a quality tuning control.
+  debug_output: generated run_config.json
+  resolution_dependent: false
+analysis.thumbnail_dpi:
+  type: integer
+  default: 96
+  allowed_range: 72-200
+  purpose: Resolution of low-cost page layout analysis.
+  increase: Small visual components are missed during classification.
+  decrease: Analysis is too slow.
+  debug_output: analysis.json
+  resolution_dependent: true
+classification.digital_min_characters:
+  type: integer
+  default: 30
+  allowed_range: 5-500
+  purpose: Minimum selectable-text characters for a digital-page decision.
+  increase: Incidental hidden text makes scans appear digital.
+  decrease: Short digital pages appear scanned.
+  debug_output: analysis.json
+  resolution_dependent: false
+classification.scan_image_coverage_threshold:
+  type: float
+  default: 0.7
+  allowed_range: 0.3-0.98
+  purpose: Full-page image coverage threshold for scanned/hybrid classification.
+  increase: Small decorative images trigger scan classification.
+  decrease: A page-filling scan is not detected.
+  debug_output: analysis.json
+  resolution_dependent: false
+classification.alignment_score_min:
+  type: float
+  default: 0.35
+  allowed_range: 0.1-0.9
+  purpose: Minimum repeated-baseline alignment for borderless-table classification.
+  increase: Free text is incorrectly classified as a table.
+  decrease: A whitespace table is classified as free text.
+  debug_output: analysis.json
+  resolution_dependent: false
+digital_text.quality_min:
+  type: float
+  default: 0.72
+  allowed_range: 0.3-0.98
+  purpose: Minimum quality for trusting selectable PDF text.
+  increase: Garbled font encoding is used directly.
+  decrease: Reliable digital text unnecessarily goes through OCR.
+  debug_output: analysis.json
+  resolution_dependent: false
+digital_text.fallback_to_ocr_when_garbled:
+  type: boolean
+  default: true
+  allowed_range: true, false
+  purpose: Switch low-quality selectable digital text to OCR when quality is below digital_text.quality_min.
+  increase: not numeric; set true when corrupted or garbled selectable text should not be trusted.
+  decrease: not numeric; set false only to force the digital text layer for debugging or exceptional files.
+  debug_output: analysis.json, page_report.json fallback_chain
+  resolution_dependent: false
+render.default_dpi:
+  type: integer
+  default: 400
+  allowed_range: 300-600
+  purpose: Render resolution for OCR pages.
+  increase: Small Arabic text, decimal points, or thin rules are unclear.
+  decrease: Memory and processing time are excessive.
+  debug_output: 01_original.png
+  resolution_dependent: true
+preprocessing.contrast.clip_limit:
+  type: float
+  default: 2.0
+  allowed_range: 1.0-5.0
+  purpose: CLAHE local contrast strength.
+  increase: Text is faint.
+  decrease: Noise and paper texture are amplified.
+  debug_output: 03_contrast.png
+  resolution_dependent: false
+preprocessing.denoise.kernel_size:
+  type: odd_integer
+  default: 3
+  allowed_range: 1-7
+  purpose: Remove small image noise.
+  increase: Speckle remains.
+  decrease: Decimal points and Arabic dots disappear.
+  debug_output: 05_denoised.png
+  resolution_dependent: true
+preprocessing.threshold.block_size:
+  type: odd_integer
+  default: 31
+  allowed_range: 11-101
+  purpose: Adaptive-threshold neighborhood size.
+  increase: Illumination changes over broad areas.
+  decrease: Local details are missed.
+  debug_output: 06_threshold.png
+  resolution_dependent: true
+preprocessing.threshold.c:
+  type: float
+  default: 12
+  allowed_range: -5-30
+  purpose: Adaptive-threshold bias.
+  increase: Background becomes foreground noise.
+  decrease: Faint strokes or punctuation disappear.
+  debug_output: 06_threshold.png
+  resolution_dependent: false
+preprocessing.deskew.minimum_detected_angle:
+  type: float
+  default: 0.15
+  allowed_range: 0-3
+  purpose: Ignore insignificant skew estimates.
+  increase: Correct pages are rotated unnecessarily.
+  decrease: Small real skew remains.
+  debug_output: 08_deskewed.png
+  resolution_dependent: false
+bordered_table.horizontal.kernel_width_ratio:
+  type: float
+  default: 0.03
+  allowed_range: 0.005-0.15
+  purpose: Horizontal morphology kernel length relative to page width.
+  increase: Text strokes are detected as rules.
+  decrease: Short horizontal borders are missed.
+  debug_output: 05_horizontal_lines.png
+  resolution_dependent: false
+bordered_table.vertical.kernel_height_ratio:
+  type: float
+  default: 0.03
+  allowed_range: 0.005-0.15
+  purpose: Vertical morphology kernel length relative to page height.
+  increase: Letter strokes are detected as vertical rules.
+  decrease: Short vertical borders are missed.
+  debug_output: 06_vertical_lines.png
+  resolution_dependent: false
+bordered_table.horizontal.minimum_line_length_ratio:
+  type: float
+  default: 0.1
+  allowed_range: 0.01-0.8
+  purpose: Minimum accepted horizontal fragment length.
+  increase: Text fragments survive as false rules.
+  decrease: Real short borders are removed.
+  debug_output: 05_horizontal_lines.png
+  resolution_dependent: false
+bordered_table.vertical.minimum_line_length_ratio:
+  type: float
+  default: 0.1
+  allowed_range: 0.01-0.8
+  purpose: Minimum accepted vertical fragment length.
+  increase: Text fragments survive as false rules.
+  decrease: Real short borders are removed.
+  debug_output: 06_vertical_lines.png
+  resolution_dependent: false
+bordered_table.horizontal.merge_gap_px:
+  type: integer
+  default: 12
+  allowed_range: 0-80
+  purpose: Close small gaps in horizontal rules.
+  increase: Broken rule segments do not connect.
+  decrease: Separate rules merge.
+  debug_output: 05_horizontal_lines.png
+  resolution_dependent: true
+bordered_table.vertical.merge_gap_px:
+  type: integer
+  default: 12
+  allowed_range: 0-80
+  purpose: Close small gaps in vertical rules.
+  increase: Broken rule segments do not connect.
+  decrease: Separate rules merge.
+  debug_output: 06_vertical_lines.png
+  resolution_dependent: true
+borderless_table.row_detection.baseline_tolerance_px:
+  type: float
+  default: 8
+  allowed_range: 2-30
+  purpose: Group words on the same visual baseline.
+  increase: One physical text line splits.
+  decrease: Adjacent lines merge.
+  debug_output: 08_detected_rows.png
+  resolution_dependent: true
+borderless_table.row_detection.continuation_line_gap_px:
+  type: float
+  default: 18
+  allowed_range: 5-100
+  purpose: Attach multiline continuation text to the prior anchored row.
+  increase: One logical transaction becomes several rows.
+  decrease: Two transactions merge.
+  debug_output: 08_detected_rows.png
+  resolution_dependent: true
+borderless_table.column_detection.x_tolerance_px:
+  type: float
+  default: 15
+  allowed_range: 3-60
+  purpose: DBSCAN tolerance for repeated X alignments.
+  increase: One logical column fragments.
+  decrease: Adjacent columns merge.
+  debug_output: 09_detected_columns.png
+  resolution_dependent: true
+borderless_table.column_detection.minimum_column_gap_px:
+  type: float
+  default: 20
+  allowed_range: 5-100
+  purpose: Merge inferred column centers closer than this gap.
+  increase: Too many nearby duplicate columns are produced.
+  decrease: Two narrow real columns merge.
+  debug_output: 09_detected_columns.png
+  resolution_dependent: true
+borderless_table.column_detection.minimum_column_support_rows:
+  type: integer
+  default: 3
+  allowed_range: 1-30
+  purpose: Minimum distinct rows supporting an inferred X alignment.
+  increase: Prose produces many false columns.
+  decrease: Sparse real columns disappear.
+  debug_output: 09_detected_columns.png
+  resolution_dependent: false
+borderless_table.column_detection.minimum_column_support_ratio:
+  type: float
+  default: 0.2
+  allowed_range: 0-1
+  purpose: Fraction of rows required to retain a column alignment.
+  increase: Unstable columns remain.
+  decrease: A valid sparse column is removed.
+  debug_output: 09_detected_columns.png
+  resolution_dependent: false
+borderless_table.row_detection.anchor_segmentation.roi_ratio:
+  type: list_float
+  default:
+  - 0.0
+  - 0.25
+  - 0.2
+  - 0.9
+  allowed_range: four values between 0 and 1
+  purpose: Relative region containing one stable row anchor.
+  increase: Extend the relevant edge to include missed anchors.
+  decrease: Exclude headers, totals, or neighboring text.
+  debug_output: page_report.json
+  resolution_dependent: false
+borderless_table.row_detection.anchor_segmentation.minimum_anchor_gap_px:
+  type: float
+  default: 20
+  allowed_range: 5-150
+  purpose: Minimum vertical separation between logical anchors.
+  increase: One multiline date/amount creates multiple anchors.
+  decrease: Two transactions merge into one anchor group.
+  debug_output: page_report.json
+  resolution_dependent: true
+cropping.padding.left:
+  type: integer
+  default: 8
+  allowed_range: 0-50
+  purpose: Preserve left-edge characters.
+  increase: The first symbol is clipped.
+  decrease: Neighboring-column text enters the crop.
+  debug_output: crops/
+  resolution_dependent: true
+cropping.padding.right:
+  type: integer
+  default: 8
+  allowed_range: 0-50
+  purpose: Preserve right-edge and RTL-leading characters.
+  increase: Arabic leading characters or closing parentheses are clipped.
+  decrease: Neighboring-column text enters the crop.
+  debug_output: crops/
+  resolution_dependent: true
+ocr.page_mode:
+  type: string
+  default: sparse
+  allowed_range: sparse, block, single_line, single_word, raw_line
+  purpose: Select the EasyOCR parameter preset used for full-page or crop OCR.
+  increase: not numeric; choose block for one dense text block.
+  decrease: not numeric; choose sparse for distributed page text.
+  debug_output: 11_ocr_overlay.png
+  resolution_dependent: false
+ocr.numeric_columns.allowlist:
+  type: string
+  default: 0123456789٠١٢٣٤٥٦٧٨٩.,/:-()
+  allowed_range: OCR characters needed by numeric/date fields
+  purpose: Preserve only expected numeric punctuation during numeric crop OCR.
+  increase: Add a genuinely required symbol.
+  decrease: Remove symbols causing false recognition, with care.
+  debug_output: cell crops and Cell Metadata
+  resolution_dependent: false
+fallback.bordered_score_ratio:
+  type: float
+  default: 0.75
+  allowed_range: 0.1-2.0
+  purpose: Required bordered structural score relative to borderless score.
+  increase: Weak false grids are selected.
+  decrease: A correct grid is rejected.
+  debug_output: fallback_chain
+  resolution_dependent: false
+validation.confidence_threshold:
+  type: float
+  default: 0.75
+  allowed_range: 0-1
+  purpose: Mark low-confidence rows for review.
+  increase: More conservative review is required.
+  decrease: Too many acceptable rows are flagged.
+  debug_output: Review Required
+  resolution_dependent: false
+validation.balance_check.tolerance:
+  type: float
+  default: 0.01
+  allowed_range: 0-10
+  purpose: Allowed arithmetic difference in balance validation.
+  increase: Legitimate rounding differences are flagged.
+  decrease: Incorrect balances pass validation.
+  debug_output: Review Required
+  resolution_dependent: false
+ocr.use_gpu:
+  type: string_or_boolean
+  default: auto
+  allowed_range: auto, true, false, cpu, cuda, mps
+  purpose: Select the EasyOCR execution device.
+  increase: not numeric; choose cuda only when a compatible CUDA PyTorch build is installed.
+  decrease: not numeric; choose false/cpu to avoid GPU issues.
+  debug_output: terminal startup message and page_report.json
+  resolution_dependent: false
+ocr.easyocr.recog_network:
+  type: string
+  default: standard
+  allowed_range: standard or an installed custom network name
+  purpose: Select EasyOCR recognition network weights and architecture.
+  increase: not numeric.
+  decrease: not numeric.
+  debug_output: generated run_config.json and EasyOCR startup logs
+  resolution_dependent: false
+output.mode:
+  type: string
+  default: full
+  allowed_range: full, data_only, cropped_cells_only, cropped_rows_only, cropped_rows_and_cells, training_dataset, custom
+  purpose: Control Excel, crop, manifest, and training-label outputs without editing Python.
+  increase: not numeric.
+  decrease: not numeric.
+  debug_output: output_summary.json
+  resolution_dependent: false
+output.training_dataset.label_source:
+  type: string
+  default: ocr_draft
+  allowed_range: ocr_draft, normalized, blank
+  purpose: Choose the draft-label content written to training_labels.csv in training_dataset mode.
+  increase: not numeric; use normalized when post-processing produces the desired draft value.
+  decrease: not numeric; use blank for fully manual labeling and to preserve OCR-empty crops for review.
+  debug_output: training_labels.csv, training_labels_draft.tsv, output_summary.json
+  resolution_dependent: false
+borderless_table.column_detection.x_tolerance_word_height_ratio:
+  type: float
+  default: 1.0
+  allowed_range: 0.2-4.0
+  purpose: Scale borderless X-clustering tolerance from measured word height so native/digital geometry survives render-DPI
+    changes.
+  increase: Increase when one logical column fragments because word centers vary with text width/high DPI.
+  decrease: Decrease when adjacent real columns merge.
+  debug_output: 09_detected_columns.png; page_report.json
+  resolution_dependent: false
+borderless_table.column_detection.maximum_x_tolerance_page_ratio:
+  type: float
+  default: 0.05
+  allowed_range: 0.005-0.15
+  purpose: Safety cap for the DPI-aware borderless X-clustering tolerance as a fraction of page width.
+  increase: Increase only when very wide/high-DPI pages still fragment one logical column.
+  decrease: Decrease when clustering reaches too far across neighboring columns.
+  debug_output: 09_detected_columns.png; page_report.json
+  resolution_dependent: false
+visual_structure.enabled:
+  type: boolean
+  default: true
+  allowed_range: true, false
+  purpose: Enable generic no-OCR visual structure detection used by crop-only modes and as a geometry fallback.
+  increase: not numeric; set true to allow shaded/projection structure fallback.
+  decrease: not numeric; set false only to isolate/disable this detector for debugging.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.maximum_analysis_dimension:
+  type: integer
+  default: 1800
+  allowed_range: 600-4000
+  purpose: Maximum internal width/height used by visual-structure analysis before mapping coordinates back to full resolution.
+  increase: Increase when tiny structure disappears after internal downscaling and memory permits.
+  decrease: Decrease when visual geometry analysis is too slow or memory-heavy.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.shaded_preference_min_confidence:
+  type: float
+  default: 0.45
+  allowed_range: 0-1
+  purpose: Confidence above which repeated shaded/filled-cell geometry is preferred over projection geometry.
+  increase: Increase when weak shaded artifacts incorrectly beat a cleaner borderless projection result.
+  decrease: Decrease when real shaded cells are being ignored in favor of projection.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.enabled:
+  type: boolean
+  default: true
+  allowed_range: true, false
+  purpose: Enable detection of repeated filled/shaded cell rectangles without OCR.
+  increase: not numeric; true enables this route.
+  decrease: not numeric; false disables it for isolation.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.background_percentile:
+  type: float
+  default: 95.0
+  allowed_range: 50-100
+  purpose: Estimate page background intensity from this grayscale percentile.
+  increase: Increase for pages dominated by bright background.
+  decrease: Decrease when the high percentile is biased by bright artifacts and misses light-gray cell fills.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.contrast_deltas:
+  type: list_number
+  default:
+  - 6
+  - 8
+  - 10
+  - 12
+  allowed_range: list of positive grayscale deltas
+  purpose: Try multiple darkness deltas below estimated background when isolating shaded cell fills.
+  increase: Add/larger deltas for darker fills or noisy backgrounds.
+  decrease: Use smaller deltas for very faint/light-gray cell fills.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.blur_kernel_ratio:
+  type: float
+  default: 0.006
+  allowed_range: 0.001-0.03
+  purpose: Blur scale used to suppress text while preserving broad shaded cell fills.
+  increase: Increase when text strokes remain as false filled components.
+  decrease: Decrease when small/narrow shaded cells are blurred away.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.opening_kernel_ratio:
+  type: float
+  default: 0.0025
+  allowed_range: 0-0.02
+  purpose: Morphological opening scale used to remove small noise from the shaded mask.
+  increase: Increase when small noise/text remnants produce false components.
+  decrease: Decrease when thin/light real cell fills disappear.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.minimum_component_width_px:
+  type: integer
+  default: 40
+  allowed_range: 1+
+  purpose: Absolute minimum shaded-component width.
+  increase: Increase to reject small text/logo blobs.
+  decrease: Decrease for genuinely narrow shaded columns.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.shaded_grid.minimum_component_width_ratio:
+  type: float
+  default: 0.02
+  allowed_range: 0-1
+  purpose: Page-width-relative minimum shaded-component width.
+  increase: Increase to reject small non-cell rectangles.
+  decrease: Decrease for narrow real cells.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.minimum_component_height_px:
+  type: integer
+  default: 25
+  allowed_range: 1+
+  purpose: Absolute minimum shaded-component height.
+  increase: Increase to reject text-line artifacts.
+  decrease: Decrease for short real rows.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.shaded_grid.minimum_component_height_ratio:
+  type: float
+  default: 0.01
+  allowed_range: 0-1
+  purpose: Page-height-relative minimum shaded-component height.
+  increase: Increase to reject small artifacts.
+  decrease: Decrease for short real rows.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.minimum_component_fill_ratio:
+  type: float
+  default: 0.8
+  allowed_range: 0-1
+  purpose: Minimum connected-component fill density required to treat a rectangle as a shaded cell.
+  increase: Increase when text/outline blobs are mistaken for filled cells.
+  decrease: Decrease when textured/light real cells are rejected.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.maximum_component_width_ratio:
+  type: float
+  default: 0.75
+  allowed_range: 0-1
+  purpose: Reject single shaded components wider than this page-width fraction.
+  increase: Increase for unusually wide legitimate cells.
+  decrease: Decrease when banners/background bands are mistaken for cells.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.maximum_component_height_ratio:
+  type: float
+  default: 0.6
+  allowed_range: 0-1
+  purpose: Reject single shaded components taller than this page-height fraction.
+  increase: Increase for unusually tall legitimate cells.
+  decrease: Decrease when large page backgrounds/sidebars become candidates.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.edge_exclusion_px:
+  type: integer
+  default: 2
+  allowed_range: 0+
+  purpose: Ignore shaded components touching the page edge by this margin.
+  increase: Increase when page-edge background/scan borders create false cells.
+  decrease: Decrease when a real table intentionally touches the page edge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.shaded_grid.row_start_tolerance_px:
+  type: float
+  default: 10
+  allowed_range: 0+
+  purpose: Absolute Y-start tolerance for grouping shaded rectangles into the same row.
+  increase: Increase when one physical row fragments into multiple row groups.
+  decrease: Decrease when adjacent rows merge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.shaded_grid.row_start_tolerance_ratio:
+  type: float
+  default: 0.012
+  allowed_range: 0-0.1
+  purpose: Page-height-relative Y-start tolerance for grouping shaded rectangles.
+  increase: Increase for high-resolution/skewed rows that should align.
+  decrease: Decrease when neighboring rows are grouped together.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.minimum_columns:
+  type: integer
+  default: 2
+  allowed_range: 2+
+  purpose: Minimum aligned shaded components required to consider a row tabular.
+  increase: Increase to reject two-block layouts that are not tables.
+  decrease: Decrease only when two-column tables must be retained.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.minimum_rows:
+  type: integer
+  default: 2
+  allowed_range: 1+
+  purpose: Minimum aligned rows required to emit a shaded-grid table.
+  increase: Increase to reject isolated decorative grids.
+  decrease: Decrease for legitimate one-row tables.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.maximum_columns:
+  type: integer
+  default: 16
+  allowed_range: 2+
+  purpose: Maximum seed columns accepted before suppressing fragmented/noisy candidates.
+  increase: Increase for genuine very-wide tables.
+  decrease: Decrease when text fragments create excessive columns.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.x_alignment_tolerance_px:
+  type: float
+  default: 12
+  allowed_range: 0+
+  purpose: Absolute X-start tolerance when matching row components to seed columns.
+  increase: Increase when one logical column drifts across rows.
+  decrease: Decrease when neighboring columns cross-match.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.shaded_grid.x_alignment_tolerance_ratio:
+  type: float
+  default: 0.012
+  allowed_range: 0-0.1
+  purpose: Page-width-relative X alignment tolerance for shaded cells.
+  increase: Increase for high-DPI/layout drift.
+  decrease: Decrease for closely spaced columns that merge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.minimum_row_match_ratio:
+  type: float
+  default: 0.35
+  allowed_range: 0-1
+  purpose: Minimum fraction of seed columns that a row must match.
+  increase: Increase to reject structurally inconsistent rows/noise.
+  decrease: Decrease to keep sparse rows containing many blanks.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.minimum_row_matches:
+  type: integer
+  default: 2
+  allowed_range: 1+
+  purpose: Absolute minimum seed-column matches required to retain a row.
+  increase: Increase to reject weak/non-tabular rows.
+  decrease: Decrease for sparse but valid tables.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.table_split_gap_factor:
+  type: float
+  default: 2.75
+  allowed_range: 1+
+  purpose: Multiplier on observed row cadence used when splitting vertically separated table blocks.
+  increase: Increase when one table is incorrectly split.
+  decrease: Decrease when separate vertically distant tables are fused.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.table_split_gap_page_ratio:
+  type: float
+  default: 0.18
+  allowed_range: 0-1
+  purpose: Minimum page-height-relative gap considered when splitting table blocks.
+  increase: Increase to avoid splitting tables with large row spacing.
+  decrease: Decrease to separate tables closer together.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.table_split_gap_height_factor:
+  type: float
+  default: 4.0
+  allowed_range: 1+
+  purpose: Row-height-relative gap factor used for table-block splitting.
+  increase: Increase when wrapped/tall rows trigger false table splits.
+  decrease: Decrease when separate tables remain joined.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.confidence_rows_target:
+  type: integer
+  default: 4
+  allowed_range: 1+
+  purpose: Number of aligned rows at which structural confidence reaches its full row-count contribution.
+  increase: Increase to be more conservative on short tables.
+  decrease: Decrease to give short tables higher confidence.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.shaded_grid.outer_padding_px:
+  type: float
+  default: 0
+  allowed_range: 0+
+  purpose: Extra padding added to outer inferred table boundaries.
+  increase: Increase when crop edges cut into the first/last cells.
+  decrease: Decrease when table crops bleed into surrounding content.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.shaded_grid.minimum_column_width_px:
+  type: float
+  default: 12
+  allowed_range: 1+
+  purpose: Minimum spacing retained between inferred shaded-grid column boundaries.
+  increase: Increase to remove tiny ghost columns.
+  decrease: Decrease for genuine narrow columns.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.enabled:
+  type: boolean
+  default: true
+  allowed_range: true, false
+  purpose: Enable borderless scanned table inference from text-ink geometry without OCR recognition.
+  increase: not numeric; true enables this route.
+  decrease: not numeric; false disables it for isolation.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.remove_horizontal_line_ratio:
+  type: float
+  default: 0.08
+  allowed_range: 0.005-0.5
+  purpose: Morphology length used to remove long horizontal rules before text-ink projection.
+  increase: Increase when normal text strokes are being removed as rules.
+  decrease: Decrease when real long rules remain and become giant text components.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.remove_vertical_line_ratio:
+  type: float
+  default: 0.08
+  allowed_range: 0.005-0.5
+  purpose: Morphology length used to remove long vertical rules before projection.
+  increase: Increase when normal glyph strokes are removed as rules.
+  decrease: Decrease when long vertical rules remain as false text components.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.close_width_px:
+  type: integer
+  default: 4
+  allowed_range: 1+
+  purpose: Horizontal closing width that reconnects nearby text fragments before component analysis.
+  increase: Increase when characters/words in one cell remain excessively fragmented.
+  decrease: Decrease when adjacent columns begin to connect.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.close_height_px:
+  type: integer
+  default: 1
+  allowed_range: 1+
+  purpose: Vertical closing height for text-ink components.
+  increase: Increase when broken glyph strokes need reconnecting.
+  decrease: Decrease when text from adjacent lines connects vertically.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.minimum_text_component_area_px:
+  type: integer
+  default: 8
+  allowed_range: 1+
+  purpose: Minimum foreground component area retained as text-like ink.
+  increase: Increase to reject speckle/noise.
+  decrease: Decrease when tiny punctuation/small-font components vanish.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.minimum_text_component_height_px:
+  type: integer
+  default: 3
+  allowed_range: 1+
+  purpose: Minimum component height retained as text-like ink.
+  increase: Increase to reject tiny noise.
+  decrease: Decrease for very small text.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.maximum_text_component_height_ratio:
+  type: float
+  default: 0.08
+  allowed_range: 0-1
+  purpose: Reject projection components taller than this page-height fraction.
+  increase: Increase for unusually tall text blocks.
+  decrease: Decrease when logos/graphics survive as text components.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.maximum_text_component_width_ratio:
+  type: float
+  default: 0.55
+  allowed_range: 0-1
+  purpose: Reject projection components wider than this page-width fraction.
+  increase: Increase for very long legitimate single-cell text.
+  decrease: Decrease when paragraphs/banners become table blocks.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.baseline_tolerance_px:
+  type: float
+  default: 4
+  allowed_range: 0+
+  purpose: Absolute vertical tolerance for grouping text components onto one visual line.
+  increase: Increase when one physical line fragments.
+  decrease: Decrease when adjacent lines merge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.baseline_tolerance_height_ratio:
+  type: float
+  default: 0.8
+  allowed_range: 0+
+  purpose: Scale baseline grouping tolerance from measured component height.
+  increase: Increase for uneven baselines/scan jitter.
+  decrease: Decrease when nearby lines merge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.baseline_tolerance_page_ratio:
+  type: float
+  default: 0.001
+  allowed_range: 0-0.1
+  purpose: Page-height-relative floor for baseline grouping tolerance.
+  increase: Increase when high-resolution pages fragment rows.
+  decrease: Decrease when neighboring lines merge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.intra_block_merge_gap_px:
+  type: float
+  default: 10
+  allowed_range: 0+
+  purpose: Absolute horizontal gap below which neighboring text components on one line may be merged into one logical cell
+    block.
+  increase: Increase when one cell remains split into several fragments.
+  decrease: Decrease when two close columns merge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.intra_block_merge_height_ratio:
+  type: float
+  default: 1.5
+  allowed_range: 0+
+  purpose: Adaptive intra-cell merge gap measured in typical text heights.
+  increase: Increase when dates/descriptions/amounts fragment into fake columns.
+  decrease: Decrease when genuinely close columns merge.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.minimum_columns:
+  type: integer
+  default: 2
+  allowed_range: 2+
+  purpose: Minimum text blocks required on a line to consider projection tabular.
+  increase: Increase to reject simple two-block layouts.
+  decrease: Decrease only for two-column tables.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.minimum_rows:
+  type: integer
+  default: 2
+  allowed_range: 1+
+  purpose: Minimum aligned projection rows required to emit a table.
+  increase: Increase to reject isolated aligned lines.
+  decrease: Decrease for legitimate one-row tables.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.maximum_columns:
+  type: integer
+  default: 16
+  allowed_range: 2+
+  purpose: Maximum projection seed columns before fragment suppression.
+  increase: Increase for genuine very-wide tables.
+  decrease: Decrease when fragmented text produces too many columns.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.x_alignment_tolerance_px:
+  type: float
+  default: 12
+  allowed_range: 0+
+  purpose: Absolute X-start tolerance when matching projection blocks to seed columns.
+  increase: Increase when one column drifts across rows.
+  decrease: Decrease when neighboring columns cross-match.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.x_alignment_tolerance_ratio:
+  type: float
+  default: 0.012
+  allowed_range: 0-0.1
+  purpose: Page-width-relative X alignment tolerance for projection blocks.
+  increase: Increase for high-DPI/layout drift.
+  decrease: Decrease for closely spaced real columns.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.minimum_row_match_ratio:
+  type: float
+  default: 0.35
+  allowed_range: 0-1
+  purpose: Minimum fraction of seed columns a projection row must match.
+  increase: Increase to reject inconsistent prose/noise.
+  decrease: Decrease for sparse tables with blank cells.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.minimum_row_matches:
+  type: integer
+  default: 2
+  allowed_range: 1+
+  purpose: Absolute minimum aligned projection blocks needed to retain a row.
+  increase: Increase to reject weak rows.
+  decrease: Decrease for sparse valid rows.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.table_split_gap_factor:
+  type: float
+  default: 2.75
+  allowed_range: 1+
+  purpose: Observed-row-cadence multiplier used to split separate projection table blocks.
+  increase: Increase when one table splits incorrectly.
+  decrease: Decrease when separate tables are fused.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.table_split_gap_page_ratio:
+  type: float
+  default: 0.18
+  allowed_range: 0-1
+  purpose: Page-height-relative gap threshold for projection table splitting.
+  increase: Increase for tables with large row spacing.
+  decrease: Decrease to split tables that are closer together.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.table_split_gap_height_factor:
+  type: float
+  default: 4.0
+  allowed_range: 1+
+  purpose: Row-height-relative projection table split threshold.
+  increase: Increase when tall/wrapped rows cause false splits.
+  decrease: Decrease when separate blocks remain joined.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.confidence_rows_target:
+  type: integer
+  default: 4
+  allowed_range: 1+
+  purpose: Aligned-row target used when scaling projection structural confidence.
+  increase: Increase to be conservative about short candidates.
+  decrease: Decrease to trust short tables more quickly.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: false
+visual_structure.projection_grid.outer_padding_px:
+  type: float
+  default: 0
+  allowed_range: 0+
+  purpose: Extra padding around outer projection-derived table boundaries.
+  increase: Increase when first/last cells are clipped.
+  decrease: Decrease when surrounding content bleeds into crops.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.projection_grid.minimum_column_width_px:
+  type: float
+  default: 12
+  allowed_range: 1+
+  purpose: Minimum width retained between projection-derived column boundaries.
+  increase: Increase to remove tiny ghost columns.
+  decrease: Decrease for narrow legitimate columns.
+  debug_output: 07b_visual_detected_regions.png; page_report.json
+  resolution_dependent: true
+visual_structure.text_detection_fallback.enabled:
+  type: boolean
+  default: true
+  allowed_range: true, false
+  purpose: Allow crop-only modes to use detection-only EasyOCR/CRAFT text boxes when native/OpenCV geometry finds no usable row/cell structure. Character recognition remains disabled.
+  increase: not numeric; set true when borderless or visually weak scans produce no rows/cells from OpenCV geometry alone.
+  decrease: set false only when crop-only processing must avoid loading any neural text detector.
+  debug_output: 07c_text_detection_boxes.png, page_report.json, fallback_chain
+  resolution_dependent: false
+visual_structure.text_detection_fallback.engine:
+  type: string
+  default: easyocr
+  allowed_range: easyocr
+  purpose: Detection-only text-box backend used as the final crop-only structure fallback.
+  increase: not numeric.
+  decrease: not numeric.
+  debug_output: page_report.json
+  resolution_dependent: false
+visual_structure.text_detection_fallback.minimum_boxes:
+  type: integer
+  default: 4
+  allowed_range: 1-100
+  purpose: Minimum detected text boxes required before positional row/column clustering is attempted.
+  increase: Noise or isolated labels are being misinterpreted as table structure.
+  decrease: Sparse tables with only a few populated cells are being ignored.
+  debug_output: 07c_text_detection_boxes.png, page_report.json
+  resolution_dependent: false
+visual_structure.text_detection_fallback.structural_confidence:
+  type: float
+  default: 0.60
+  allowed_range: 0.0-1.0
+  purpose: Fallback structural confidence used when detection-only box geometry does not provide its own confidence signal.
+  increase: Only after confirming the detector boxes consistently match real table content.
+  decrease: When detection-only structure should be treated more cautiously in candidate scoring.
+  debug_output: page_report.json
+  resolution_dependent: false
+ocr.easyocr_detection.verbose:
+  type: boolean
+  default: false
+  allowed_range: true, false
+  purpose: Show or suppress EasyOCR Reader startup messages for the detection-only fallback. The pipeline logs the selected device separately.
+  increase: set true when debugging EasyOCR detector initialization.
+  decrease: set false for cleaner normal terminal output.
+  debug_output: terminal startup output
+  resolution_dependent: false
+ocr.easyocr_detection.min_size:
+  type: integer
+  default: 5
+  allowed_range: 1-100
+  purpose: Minimum text-box size considered by EasyOCR detection-only mode.
+  increase: Tiny noise marks are detected as text boxes.
+  decrease: Very small real text is missed.
+  debug_output: 07c_text_detection_boxes.png
+  resolution_dependent: true
+ocr.easyocr_detection.text_threshold:
+  type: float
+  default: 0.55
+  allowed_range: 0.1-0.95
+  purpose: CRAFT text confidence threshold for detection-only structure evidence.
+  increase: Too many background/noise boxes are detected.
+  decrease: Faint text regions are missed.
+  debug_output: 07c_text_detection_boxes.png
+  resolution_dependent: false
+ocr.easyocr_detection.low_text:
+  type: float
+  default: 0.30
+  allowed_range: 0.05-0.9
+  purpose: Low-confidence text threshold used by the CRAFT detector when linking text regions.
+  increase: Weak noise is being connected into boxes.
+  decrease: Faint characters fail to contribute to text regions.
+  debug_output: 07c_text_detection_boxes.png
+  resolution_dependent: false
+ocr.easyocr_detection.link_threshold:
+  type: float
+  default: 0.30
+  allowed_range: 0.05-0.9
+  purpose: CRAFT affinity threshold for joining nearby character regions into text boxes.
+  increase: Separate nearby fields are being merged into one text box.
+  decrease: Words or lines are fragmented into too many small boxes.
+  debug_output: 07c_text_detection_boxes.png
+  resolution_dependent: false
+ocr.easyocr_detection.canvas_size:
+  type: integer
+  default: 2560
+  allowed_range: 512-6000
+  purpose: Maximum internal detector canvas size.
+  increase: Very small text on large pages is missed and memory is available.
+  decrease: Detection consumes too much CPU memory/time.
+  debug_output: page_report.json
+  resolution_dependent: true
+ocr.easyocr_detection.mag_ratio:
+  type: float
+  default: 1.0
+  allowed_range: 0.5-3.0
+  purpose: Magnification applied by EasyOCR text detection.
+  increase: Small/faint text regions need more detector resolution.
+  decrease: Runtime or memory is excessive.
+  debug_output: 07c_text_detection_boxes.png
+  resolution_dependent: true
+ocr.easyocr_detection.bbox_min_score:
+  type: float
+  default: 0.20
+  allowed_range: 0.0-1.0
+  purpose: Minimum score for detector bounding boxes when supported by the installed EasyOCR version.
+  increase: Low-quality false boxes are common.
+  decrease: Real faint boxes are being filtered out.
+  debug_output: 07c_text_detection_boxes.png
+  resolution_dependent: false
+ocr.easyocr_detection.bbox_min_size:
+  type: integer
+  default: 3
+  allowed_range: 1-100
+  purpose: Minimum detector box size when supported by the installed EasyOCR version.
+  increase: Very small false detections dominate.
+  decrease: Tiny legitimate text is missed.
+  debug_output: 07c_text_detection_boxes.png
+  resolution_dependent: true
+ocr.easyocr_detection.max_candidates:
+  type: integer
+  default: 0
+  allowed_range: 0 or positive integer
+  purpose: Maximum CRAFT candidates when supported; zero leaves the backend default/unlimited behavior.
+  increase: Permit more candidate regions on dense pages.
+  decrease: Limit extreme candidate counts on noisy pages.
+  debug_output: page_report.json
+  resolution_dependent: false
+ocr.easyocr_detection.structural_box_confidence:
+  type: float
+  default: 0.60
+  allowed_range: 0.0-1.0
+  purpose: Internal confidence attached to detection-only WordBox geometry; it is not OCR recognition confidence.
+  increase: Only after validating detector geometry across representative PDFs.
+  decrease: When detector-only boxes should influence structural decisions less strongly.
+  debug_output: page_report.json, crop_manifest.csv confidence_type=geometry
+  resolution_dependent: false

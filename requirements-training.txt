@@ -1,0 +1,9 @@
+# Optional helper dependencies commonly needed around custom recognition training.
+# The core PDF pipeline and dataset preparation tool are covered by requirements.txt.
+# EasyOCR's actual recognition trainer code is maintained separately by EasyOCR.
+-r requirements.txt
+lmdb>=1.4
+natsort>=8.4
+fire>=0.6
+tqdm>=4.66
+tensorboard>=2.15

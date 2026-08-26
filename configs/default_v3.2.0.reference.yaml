@@ -1,0 +1,528 @@
+# Generic PDF extraction configuration.
+#
+# Engine priority:
+#   CLI --override > page_overrides > JSON --run-config > this file
+# Standard developer workflow: use this YAML for project-wide defaults and the
+# generated JSON for PDF-specific tuning; do not use CLI overrides routinely.
+#
+# Ratios describe page/table-scale geometry and normally survive DPI changes.
+# Pixel values describe local gaps, padding, and morphology and may need scaling
+# when render.default_dpi changes substantially.
+
+project:
+  name: universal_pdf_extraction_pipeline
+  version: 3.2.0-text-detection
+  deterministic: true
+  random_seed: 42
+
+analysis:
+  # Low-cost page analysis before full extraction.
+  thumbnail_dpi: 96
+  # Rendering resolution used only to visualize reliable digital WordBoxes.
+  digital_layout_dpi: 144
+
+classification:
+  digital_min_characters: 30
+  scan_image_coverage_threshold: 0.70
+  horizontal_line_density_min: 0.002
+  vertical_line_density_min: 0.001
+  alignment_score_min: 0.35
+
+digital_text:
+  # Direct PDF text is trusted only above this quality score.
+  quality_min: 0.72
+  # When selectable text exists but its quality is below quality_min, switch
+  # to OCR. Set false only when you deliberately want to keep the digital
+  # text layer even when the analyzer considers it garbled.
+  fallback_to_ocr_when_garbled: true
+
+render:
+  # 300: clear normal print; 400: financial baseline; 500-600: small text.
+  default_dpi: 400
+  minimum_dpi: 300
+  maximum_dpi: 600
+  use_embedded_image_when_possible: true
+  embedded_image_minimum_dpi: 250
+  rerender_low_resolution_embedded_images: true
+
+preprocessing:
+  # auto chooses a useful binary image when foreground density is plausible;
+  # otherwise it uses the deskewed grayscale image.
+  selected_variant: auto
+
+  contrast:
+    enabled: true
+    method: clahe       # clahe | normalize
+    clip_limit: 2.0
+    tile_grid_size: [8, 8]
+
+  shadow_removal:
+    enabled: false
+    kernel_size: 31
+
+  denoise:
+    enabled: true
+    method: median      # median | gaussian | bilateral
+    kernel_size: 3
+
+  sharpening:
+    enabled: false
+    amount: 1.0
+    radius: 1.0
+
+  threshold:
+    enabled: true
+    method: adaptive_gaussian  # adaptive_gaussian | adaptive_mean | otsu | global
+    block_size: 31
+    c: 12
+    value: 180
+    invert: true
+
+  morphology:
+    opening_kernel: [1, 1]
+    closing_kernel: [2, 2]
+    dilation_kernel: [1, 1]
+    erosion_kernel: [1, 1]
+
+  deskew:
+    enabled: true
+    maximum_angle: 10.0
+    minimum_detected_angle: 0.15
+
+bordered_table:
+  enabled: true
+  minimum_region_area_ratio: 0.01
+
+  horizontal:
+    kernel_width_ratio: 0.03
+    kernel_height: 1
+    minimum_line_length_ratio: 0.10
+    merge_gap_px: 12
+
+  vertical:
+    kernel_height_ratio: 0.03
+    kernel_width: 1
+    minimum_line_length_ratio: 0.10
+    merge_gap_px: 12
+
+  intersections:
+    minimum_area: 3
+
+  cells:
+    minimum_width_px: 15
+    minimum_height_px: 10
+    minimum_area_px: 150
+
+  row_merge_tolerance_px: 8
+  column_merge_tolerance_px: 8
+
+borderless_table:
+  enabled: true
+
+  row_detection:
+    y_overlap_ratio: 0.50
+    baseline_tolerance_px: 8
+    continuation_line_gap_px: 18
+    merge_multiline_rows: true
+
+    # Used by ordinary borderless continuation merging.
+    anchor_type: auto       # auto | date | amount
+    anchor_x_range_ratio: null
+
+    # Optional stronger row segmentation when every logical row contains one
+    # stable date/amount/reference anchor. Disabled by default because no PDF-
+    # specific coordinates are assumed.
+    anchor_segmentation:
+      enabled: false
+      boundary_mode: midpoint  # midpoint | anchor_start
+      anchor_type: amount   # amount | date | digit_line
+      candidate_source: roi_ocr  # roi_ocr | full_page_words | projection
+      roi_ratio: [0.0, 0.25, 0.20, 0.90]
+      ocr_mode: sparse
+      minimum_confidence: 0.15
+      minimum_digits: 1
+      minimum_anchors: 3
+      minimum_anchor_gap_px: 20
+      default_row_height_px: 80
+      table_x0_ratio: 0.0
+      table_x1_ratio: 1.0
+      column_boundaries_ratio: null
+      expected_columns: 1
+
+      projection_vertical_kernel_ratio: 0.05
+      projection_close_width_px: 5
+      projection_close_height_px: 2
+      projection_ink_threshold_ratio: 0.02
+      projection_min_ink_px: 2
+      projection_min_band_height_px: 3
+      projection_merge_gap_px: 40
+      projection_confidence: 0.70
+
+      cell_ocr:
+        enabled: false
+        types: [amount, date, time]
+        column_types: []
+        retry_empty: true
+        always: false
+        existing_confidence_threshold: 0.90
+        minimum_confidence: 0.20
+        prefer_valid_candidate: true
+        scale_factor: 1.5
+        grayscale: true
+        threshold: none       # none | otsu | adaptive
+        adaptive_block_size: 31
+        adaptive_c: 11
+        padding_px:
+          top: 3
+          bottom: 3
+          left: 8
+          right: 8
+        modes:
+          amount: single_line
+          date: single_line
+          time: single_line
+        save_crops: true
+
+  column_detection:
+    x_tolerance_px: 15
+    # Scale the clustering tolerance with measured word height on high-DPI
+    # digital/hybrid page renders, while limiting it by page width.
+    x_tolerance_word_height_ratio: 1.0
+    maximum_x_tolerance_page_ratio: 0.05
+    minimum_column_gap_px: 20
+    expected_columns: null
+    # Repeated X support filters arbitrary word positions inside descriptions.
+    minimum_column_support_rows: 3
+    minimum_column_support_ratio: 0.20
+    maximum_columns: 12
+
+  clustering:
+    min_samples: 1
+
+# Generic no-OCR structure detection used by crop-only modes and as a
+# fallback when classic ruled-line geometry is incomplete. It relies only on
+# page pixels/coordinates; it never matches filenames, companies, or templates.
+visual_structure:
+  enabled: true
+  # Large pages are analyzed at a smaller internal scale for speed, then all
+  # detected coordinates are mapped back to the original rendered page.
+  maximum_analysis_dimension: 1800
+  shaded_preference_min_confidence: 0.45
+
+  # Last-resort spatial fallback for crop-only modes. EasyOCR/CRAFT is loaded
+  # with recognizer=false, so it returns only text bounding boxes. No Arabic/
+  # English recognition model is loaded and no characters are decoded.
+  text_detection_fallback:
+    enabled: true
+    engine: easyocr
+    minimum_boxes: 4
+    structural_confidence: 0.60
+
+  # Detect repeated filled/shaded cell rectangles. Useful for statements and
+  # forms that have gray cell fills or white separators rather than dark rules.
+  shaded_grid:
+    enabled: true
+    background_percentile: 95.0
+    contrast_deltas: [6, 8, 10, 12]
+    blur_kernel_ratio: 0.006
+    opening_kernel_ratio: 0.0025
+    minimum_component_width_px: 40
+    minimum_component_width_ratio: 0.02
+    minimum_component_height_px: 25
+    minimum_component_height_ratio: 0.01
+    minimum_component_fill_ratio: 0.80
+    maximum_component_width_ratio: 0.75
+    maximum_component_height_ratio: 0.60
+    edge_exclusion_px: 2
+    row_start_tolerance_px: 10
+    row_start_tolerance_ratio: 0.012
+    minimum_columns: 2
+    minimum_rows: 2
+    maximum_columns: 16
+    x_alignment_tolerance_px: 12
+    x_alignment_tolerance_ratio: 0.012
+    minimum_row_match_ratio: 0.35
+    minimum_row_matches: 2
+    table_split_gap_factor: 2.75
+    table_split_gap_page_ratio: 0.18
+    table_split_gap_height_factor: 4.0
+    confidence_rows_target: 4
+    outer_padding_px: 0
+    minimum_column_width_px: 12
+
+  # Borderless scanned fallback. Text is treated only as ink geometry; no OCR
+  # recognition or language model is invoked.
+  projection_grid:
+    enabled: true
+    remove_horizontal_line_ratio: 0.08
+    remove_vertical_line_ratio: 0.08
+    close_width_px: 4
+    close_height_px: 1
+    minimum_text_component_area_px: 8
+    minimum_text_component_height_px: 3
+    maximum_text_component_height_ratio: 0.08
+    maximum_text_component_width_ratio: 0.55
+    baseline_tolerance_px: 4
+    baseline_tolerance_height_ratio: 0.8
+    baseline_tolerance_page_ratio: 0.001
+    intra_block_merge_gap_px: 10
+    intra_block_merge_height_ratio: 1.5
+    minimum_columns: 2
+    minimum_rows: 2
+    maximum_columns: 16
+    x_alignment_tolerance_px: 12
+    x_alignment_tolerance_ratio: 0.012
+    minimum_row_match_ratio: 0.35
+    minimum_row_matches: 2
+    table_split_gap_factor: 2.75
+    table_split_gap_page_ratio: 0.18
+    table_split_gap_height_factor: 4.0
+    confidence_rows_target: 4
+    outer_padding_px: 0
+    minimum_column_width_px: 12
+
+cropping:
+  add_padding: true
+  padding:
+    top: 5
+    bottom: 5
+    left: 8
+    right: 8
+  clamp_to_page: true
+  save_all_crops: true
+
+fallback:
+  minimum_rows_for_bordered: 4
+  bordered_score_ratio: 0.75
+  prefer_bordered_when_detected: false
+
+ocr:
+  # EasyOCR is now the default OCR engine. Tesseract is not used.
+  engine: easyocr       # easyocr | paddleocr
+  languages: [ar, en]
+  # auto uses CUDA/MPS when available and otherwise uses CPU.
+  use_gpu: auto         # auto | true | false | cpu | cuda | mps
+  fallback_to_easyocr: true
+  # sparse is appropriate for full-page layout OCR.
+  page_mode: sparse
+
+  numeric_columns:
+    allowlist: "0123456789٠١٢٣٤٥٦٧٨٩.,/:-()"
+
+  easyocr:
+    # EasyOCR downloads standard weights on first use when enabled.
+    download_enabled: true
+    model_storage_directory: models/easyocr/model
+    user_network_directory: models/easyocr/user_network
+    detect_network: craft
+    # Change to the name of a custom model after placing matching
+    # <name>.pth, <name>.yaml, and <name>.py files in the configured dirs.
+    recog_network: standard
+    verbose: true
+    quantize: true
+    cudnn_benchmark: false
+
+    decoder: greedy       # greedy | beamsearch | wordbeamsearch
+    beam_width: 5
+    batch_size: 1
+    workers: 0
+    min_size: 5
+    rotation_info: null
+
+    contrast_ths: 0.10
+    adjust_contrast: 0.50
+    filter_ths: 0.003
+    text_threshold: 0.70
+    low_text: 0.40
+    link_threshold: 0.40
+    canvas_size: 2560
+    mag_ratio: 1.0
+    slope_ths: 0.10
+    ycenter_ths: 0.50
+    height_ths: 0.50
+    width_ths: 0.50
+    add_margin: 0.10
+    x_ths: 1.0
+    y_ths: 0.50
+    binary_threshold: 0.20
+
+    # Each mode can override any EasyOCR readtext parameter.
+    modes:
+      sparse:
+        paragraph: false
+        min_size: 5
+        text_threshold: 0.55
+        low_text: 0.30
+        link_threshold: 0.30
+      block:
+        paragraph: false
+        width_ths: 0.70
+        ycenter_ths: 0.60
+      row:
+        paragraph: false
+        width_ths: 1.50
+        ycenter_ths: 0.80
+        height_ths: 0.80
+      single_line:
+        paragraph: false
+        min_size: 3
+        width_ths: 10.0
+        ycenter_ths: 1.0
+        height_ths: 1.0
+        add_margin: 0.05
+      single_word:
+        paragraph: false
+        min_size: 2
+        width_ths: 10.0
+        ycenter_ths: 1.0
+        height_ths: 1.0
+        add_margin: 0.02
+      raw_line:
+        paragraph: false
+        min_size: 2
+        width_ths: 10.0
+        ycenter_ths: 1.0
+        height_ths: 1.0
+
+  # Detection-only CRAFT settings used by visual_structure.text_detection_fallback.
+  # This Reader is initialized with detector=true and recognizer=false.
+  easyocr_detection:
+    verbose: false
+    min_size: 5
+    text_threshold: 0.55
+    low_text: 0.30
+    link_threshold: 0.30
+    canvas_size: 2560
+    mag_ratio: 1.0
+    slope_ths: 0.10
+    ycenter_ths: 0.50
+    height_ths: 0.50
+    width_ths: 0.50
+    add_margin: 0.10
+    binary_threshold: 0.20
+    bbox_min_score: 0.20
+    bbox_min_size: 3
+    max_candidates: 0
+    structural_box_confidence: 0.60
+
+  paddleocr:
+    lang: arabic
+    use_angle_classifier: true
+    det_db_thresh: 0.30
+    det_db_box_thresh: 0.50
+    det_db_unclip_ratio: 1.5
+
+# Empty means generic column_1, column_2, ... output.
+# Add names/types only after the geometry is correct and the document columns
+# are known. This is semantic configuration, not a PDF-specific code branch.
+schema:
+  columns: []
+
+reconstruction:
+  remove_repeated_headers: true
+  header_keywords:
+    - date
+    - description
+    - debit
+    - credit
+    - balance
+    - invoice
+    - total
+    - التاريخ
+    - البيان
+    - الوصف
+    - مدين
+    - دائن
+    - الرصيد
+    - الإجمالي
+
+validation:
+  enabled: true
+  confidence_threshold: 0.75
+  expected_columns: null
+  required_columns: []
+
+  geometry_check:
+    enabled: true
+    overlap_ratio_threshold: 0.20
+    out_of_page_tolerance_px: 3
+    unusual_height_zscore: 3.0
+    unusual_gap_zscore: 3.0
+
+  balance_check:
+    enabled: false
+    formula: previous_balance + credit - debit
+    order: chronological
+    absolute_debit_credit: true
+    tolerance: 0.01
+    fields:
+      debit: debit
+      credit: credit
+      balance: balance
+
+  date_check:
+    enabled: true
+    allowed_formats:
+      - "%d/%m/%Y"
+      - "%Y-%m-%d"
+      - "%d-%m-%Y"
+      - "%m/%d/%Y"
+
+  numeric_check:
+    enabled: true
+
+output:
+  # Change this value inside the generated *.run_config.json and pass the
+  # JSON back with --run-config. No Python file needs to be edited.
+  # Modes:
+  #   full                     = Excel + row crops + cell crops + manifests
+  #   data_only                = Excel only
+  #   cropped_cells_only       = cell images and manifests only
+  #   cropped_rows_only        = row images and manifests only
+  #   cropped_rows_and_cells   = row/cell images and manifests, no Excel
+  #   training_dataset         = cell images + draft labels for model training
+  #   custom                   = use the individual switches below
+  mode: full
+  artifact_directory: null
+
+  excel:
+    enabled: true
+
+  crops:
+    save_cells: true
+    save_rows: true
+    include_empty_cells: true
+    include_headers: false
+    image_format: png       # png | jpg | jpeg | webp
+    jpeg_quality: 95
+    manifest_csv: true
+    manifest_json: true
+
+  training_dataset:
+    enabled: false
+    # In training_dataset mode, training_labels.csv contains EasyOCR draft
+    # labels and an empty corrected_label column for human correction.
+    # ocr_draft = raw OCR text, normalized = post-normalization value,
+    # blank = empty draft labels for fully manual labeling/review.
+    label_source: ocr_draft
+
+export:
+  csv: false
+  json: true
+  jsonl: false
+  parquet: false
+
+logging:
+  level: INFO
+
+resume:
+  enabled: true
+  skip_completed_pages: false
+
+debug:
+  enabled: false
+  output_dir: debug_output
+
+# Only for exceptional pages inside the current PDF. Keep empty for the generic
+# baseline and prefer temporary CLI --override while learning/tuning.
+page_overrides: {}

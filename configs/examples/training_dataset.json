@@ -1,0 +1,25 @@
+{
+  "config": {
+    "output": {
+      "mode": "training_dataset",
+      "crops": {
+        "image_format": "png",
+        "include_empty_cells": false,
+        "include_headers": false,
+        "manifest_csv": true,
+        "manifest_json": true
+      },
+      "training_dataset": {
+        "label_source": "ocr_draft"
+      }
+    },
+    "ocr": {
+      "engine": "easyocr",
+      "languages": [
+        "ar",
+        "en"
+      ],
+      "use_gpu": "auto"
+    }
+  }
+}

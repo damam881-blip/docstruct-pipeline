@@ -1,0 +1,34 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# OCR Model Weights & Binaries
+models/easyocr/model/*.pth
+models/easyocr/user_network/*.pth
+!models/easyocr/model/.gitkeep
+!models/easyocr/user_network/.gitkeep
+
+# IDE & Editor files
+.vscode/
+.idea/
+
+# Local Outputs & Debug Runs
+outputs/
+debug_output/
+*.run_config.json
+*.bak
+*.zip
+
+# Sensitive / Temporary data
+samples/Account_Statement_scanned.pdf
+samples/كشف حساب الراجحي.pdf
+!samples/.gitkeep
+*.xlsx

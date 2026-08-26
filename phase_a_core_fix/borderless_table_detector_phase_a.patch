@@ -1,0 +1,64 @@
+--- pipeline/borderless_table_detector.py.phaseA.bak	2026-08-23 10:20:39.491788826 +0000
++++ pipeline/borderless_table_detector.py	2026-08-23 10:21:02.005940840 +0000
+@@ -31,11 +31,18 @@
+         self._page_width = page_bbox.width
+         row_cfg = self.config.get("row_detection", {})
+         tolerance = float(row_cfg.get("baseline_tolerance_px", 8))
+-        rows = self._cluster_rows(words, tolerance)
+-        rows = self._merge_continuations(rows)
+-        anchors = self._infer_anchors(rows, page_bbox.width)
++        # Keep physical OCR line clustering separate from logical row
++        # reconstruction. Column topology must be inferred from the stable
++        # physical evidence, otherwise changing multiline-row merging can
++        # change the number of rows used by the column support threshold and
++        # create/remove columns even though the OCR word geometry is identical.
++        physical_rows = self._cluster_rows(words, tolerance)
++        logical_rows = self._merge_continuations(physical_rows)
++        anchors = self._infer_anchors(physical_rows, page_bbox.width)
+         table_id = "table_01"
+-        extracted_rows = self._build_rows(rows, anchors, file_name, page_number, table_id)
++        extracted_rows = self._build_rows(
++            logical_rows, anchors, file_name, page_number, table_id
++        )
+         bbox = union_bbox([w.bbox for w in words]) or page_bbox
+         region = TableRegion(table_id, bbox, LayoutType.BORDERLESS_TABLE, self._consistency_score(extracted_rows), [], anchors)
+         gaps = [anchors[i + 1] - anchors[i] for i in range(len(anchors) - 1)]
+@@ -44,8 +51,12 @@
+             {table_id: extracted_rows},
+             {table_id: anchors},
+             {
++                "physical_row_count": len(physical_rows),
++                "logical_row_count": len(extracted_rows),
++                # Backward-compatible alias used by existing reports/tests.
+                 "row_count": len(extracted_rows),
+                 "column_count": max(0, len(anchors) - 1),
++                "column_inference_source": "physical_rows",
+                 "median_column_gap": float(median(gaps)) if gaps else 0.0,
+             },
+         )
+@@ -76,12 +87,14 @@
+         if not cfg.get("merge_multiline_rows", True) or len(rows) < 2:
+             return rows
+         continuation_gap = float(cfg.get("continuation_line_gap_px", 18))
+-        result: list[list[WordBox]] = [rows[0]]
++        # Work on copies so logical-row merging never mutates the physical
++        # row groups. The physical groups are also used for column topology.
++        result: list[list[WordBox]] = [list(rows[0])]
+         for row in rows[1:]:
+             previous = result[-1]
+             prev_box, row_box = union_bbox([w.bbox for w in previous]), union_bbox([w.bbox for w in row])
+             if prev_box is None or row_box is None:
+-                result.append(row)
++                result.append(list(row))
+                 continue
+             gap = row_box.y0 - prev_box.y1
+             prev_has_anchor = self._has_row_anchor(previous)
+@@ -89,7 +102,7 @@
+             if gap <= continuation_gap and prev_has_anchor and not current_has_anchor:
+                 previous.extend(row)
+             else:
+-                result.append(row)
++                result.append(list(row))
+         return result
+ 
+     def _has_row_anchor(self, words: list[WordBox]) -> bool:
