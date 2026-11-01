@@ -1,6 +1,8 @@
-# Universal PDF Extraction Pipeline — Validated Baseline
+# DocStruct Pipeline — Validated Baseline
 
-A general-purpose project for extracting tables, rows, cells, and data from digital, scanned, and hybrid PDF files, using PyMuPDF + OpenCV + EasyOCR with a configuration system that can be tuned through YAML and JSON.
+**Multi-Strategy Document Structure Analysis & Data Reconstruction Pipeline**
+
+A general-purpose, configurable system for analyzing document layouts, recognizing table structures, extracting text and data, reconstructing structured records, and validating results from digital, scanned, and hybrid PDF files. It uses PyMuPDF, OpenCV, and EasyOCR, with configuration through YAML and JSON.
 
 > **Validated baseline date:** 2026-08-18  
 > **Current project metadata:** `3.2.0-text-detection`  
