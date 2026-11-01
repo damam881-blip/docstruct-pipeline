@@ -1,31 +1,31 @@
 # EasyOCR + Editable JSON Output Edition Manifest
 
-هذه النسخة تحتوي على Core عام واحد وإعداد افتراضي واحد، دون Profiles مرتبطة باسم بنك أو شركة أو ملف.
+This edition contains a single generic core and a single default configuration, with no profiles tied to a bank, company, or file name.
 
-## موجود
+## Included
 
-- `configs/default.yaml` مع EasyOCR كمحرك افتراضي.
-- أوامر `analyze`, `diagnose`, `extract`, `tune`, `inspect-config`.
-- دورة Run Config JSON: التشغيل الأول ينشئ JSON، والتشغيل التالي يستقبله عبر `--run-config`.
-- أولوية إعدادات: CLI ثم Page overrides ثم JSON ثم YAML.
-- أوضاع Output: Excel، Cropped cells، Cropped rows، Training dataset، Custom.
-- `crop_manifest.csv` و`crop_manifest.json` و`output_summary.json`.
-- أدوات إعداد بيانات تدريب Recognition Model وتثبيت نموذج EasyOCR مخصص.
-- تحليل Page-level وDigital extraction وOCR.
-- Bordered وBorderless detection وAnchor segmentation.
-- Reconstruction وValidation وExcel export وDebug overlays.
-- Unit tests وE2E tests.
+- `configs/default.yaml` with EasyOCR as the default engine.
+- Commands: `analyze`, `diagnose`, `extract`, `tune`, `inspect-config`.
+- Run Config JSON cycle: the first run creates a JSON file, and the next run accepts it via `--run-config`.
+- Configuration precedence: CLI, then page overrides, then JSON, then YAML.
+- Output modes: Excel, Cropped cells, Cropped rows, Training dataset, Custom.
+- `crop_manifest.csv`, `crop_manifest.json`, and `output_summary.json`.
+- Tools for preparing Recognition Model training data and installing a custom EasyOCR model.
+- Page-level analysis, digital extraction, and OCR.
+- Bordered and borderless detection, and anchor segmentation.
+- Reconstruction, validation, Excel export, and debug overlays.
+- Unit tests and E2E tests.
 
-## غير موجود عمدًا
+## Intentionally Not Included
 
-- مجلد `profiles/`.
-- ملفات `file_*_profile.yaml`.
-- `--profile` أو `recommend-profile`.
-- أي شرط يعتمد على اسم بنك أو شركة أو اسم ملف.
-- تدريب تلقائي على نصوص OCR غير مصححة.
-- تبعية تشغيلية على Tesseract أو `pytesseract`.
+- The `profiles/` folder.
+- `file_*_profile.yaml` files.
+- `--profile` or `recommend-profile`.
+- Any condition that depends on a bank name, company name, or file name.
+- Automatic training on uncorrected OCR text.
+- Any runtime dependency on Tesseract or `pytesseract`.
 
-## أولوية الإعدادات
+## Configuration Precedence
 
 ```text
 CLI --override
@@ -35,25 +35,26 @@ CLI --override
 ```
 
 
-## إصلاحات 3.0.1
+## 3.0.1 Fixes
 
-- `output.mode` الافتراضي أصبح `full` ليتطابق التشغيل الفعلي مع README واختبار E2E الخاص بوجود Excel.
-- `digital_text.fallback_to_ocr_when_garbled` أصبح Parameter تشغيليًا فعليًا.
-- `output.training_dataset.label_source` أصبح يدعم `ocr_draft`, `normalized`, `blank`.
-- `project.deterministic` و`project.random_seed` أصبحا Runtime controls بأفضل جهد.
-## إضافات 3.1.0
+- The default `output.mode` is now `full`, so actual runs match the README and the E2E test that checks for the Excel file.
+- `digital_text.fallback_to_ocr_when_garbled` is now an actual operational parameter.
+- `output.training_dataset.label_source` now supports `ocr_draft`, `normalized`, and `blank`.
+- `project.deterministic` and `project.random_seed` are now runtime controls on a best-effort basis.
 
-- `pipeline/visual_structure_detector.py`: كشف Structure عام بدون OCR للخلايا المظللة والجداول Borderless المعتمدة على Text-Ink Geometry.
-- Crop-only للـDigital/Hybrid يستخدم Native PyMuPDF word coordinates بدون OCR.
-- Startup log جديد `run_configuration` يوضح الـeffective mode وOCR/Excel state قبل معالجة الصفحات.
-- Warning جديد `NO_STRUCTURE_DETECTED` عند عدم وجود Structure قابل للقص.
-- `tools/upgrade_v310_config.py` يضيف Parameters الجديدة إلى YAML القائم بدون تغيير `output.mode`.
-- اختبارات Regression جديدة لمسارات Shaded / Borderless / Digital geometry-only.
-## إضافات 3.2.0
+## 3.1.0 Additions
 
-- `pipeline/ocr_engine.py` يحتوي Detection-only EasyOCR/CRAFT adapter (`recognizer=false`).
-- Crop-only يستخدم Text Detection كـ fallback فقط بعد فشل Native/OpenCV structure detection.
-- `07c_text_detection_boxes.png` لعرض Bounding Boxes الخاصة بالـ detector.
-- `tools/upgrade_v320_config.py` يضيف الإعدادات الجديدة مع الحفاظ على القيم الحالية.
-- Crop manifests تظل تميز Detection-only cells كـ geometry وليست OCR recognition.
+- `pipeline/visual_structure_detector.py`: generic structure detection without OCR for shaded cells and borderless tables based on text-ink geometry.
+- Crop-only for digital/hybrid pages uses native PyMuPDF word coordinates without OCR.
+- New `run_configuration` startup log showing the effective mode and OCR/Excel state before pages are processed.
+- New `NO_STRUCTURE_DETECTED` warning when no croppable structure is found.
+- `tools/upgrade_v310_config.py` adds the new parameters to an existing YAML without changing `output.mode`.
+- New regression tests for the shaded / borderless / digital geometry-only paths.
 
+## 3.2.0 Additions
+
+- `pipeline/ocr_engine.py` contains a detection-only EasyOCR/CRAFT adapter (`recognizer=false`).
+- Crop-only uses text detection as a fallback only after native/OpenCV structure detection fails.
+- `07c_text_detection_boxes.png` shows the detector's bounding boxes.
+- `tools/upgrade_v320_config.py` adds the new settings while preserving existing values.
+- Crop manifests continue to distinguish detection-only cells as geometry, not OCR recognition.
