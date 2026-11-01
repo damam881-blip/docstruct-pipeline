@@ -1,4 +1,4 @@
-# Universal PDF Extraction Pipeline — Developer Handoff, Validated Baseline & Troubleshooting Guide
+# DocStruct Pipeline — Developer Handoff, Validated Baseline & Troubleshooting Guide
 
 ## Table of Contents
 
@@ -69,7 +69,7 @@
 
 ---
 
-<p>This is the main guide for handing off, operating, and troubleshooting the PDF data extraction system. It takes a developer from opening the project in VS Code through full execution, diagnostics, configuration tuning, and determining when source-code changes are needed.</p>
+<p><strong>DocStruct Pipeline — Multi-Strategy Document Structure Analysis &amp; Data Reconstruction Pipeline.</strong> This is the main guide for handing off, operating, and troubleshooting the PDF data extraction system. It takes a developer from opening the project in VS Code through full execution, diagnostics, configuration tuning, and determining when source-code changes are needed.</p>
 
 > **Purpose:** This is the developer-facing front door for the workspace. A developer should be able to open the project in VS Code, verify the environment/model setup, process a new PDF, diagnose geometry/OCR failures, tune the correct parameter, and know when a source-code change is required.
 
