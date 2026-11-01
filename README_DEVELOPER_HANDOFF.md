@@ -2041,7 +2041,7 @@ CRAFT only says **where text exists**. The boxes are then passed through the sam
 
 ### `native_digital_spatial`
 
-<p dir="rtl" align="right"><strong>الصفحة Digital وبداخل الـ PDF نفسه Text له إحداثيات جاهزة.</strong> لا يحتاج OCR لاكتشاف أماكن الكلمات؛ PyMuPDF يوفر الكلمات والـ Bounding Boxes مباشرة، ثم يستخدم النظام Spatial Clustering لبناء Structure.</p>
+<p>This digital PDF already contains text with coordinates. PyMuPDF supplies words and bounding boxes directly, allowing spatial clustering without OCR.</p>
 
 **Think of it as:** `native PDF word coordinates → spatial clustering → cells`.
 
@@ -2071,13 +2071,13 @@ CRAFT only says **where text exists**. The boxes are then passed through the sam
 | `maximum_columns` | `12` | Maximum retained columns. | **Lower** if severe overcounting; **raise** for genuine tables with >12 columns. |
 | `clustering.min_samples` | `1` | Minimum samples in DBSCAN X clusters. | **Raise** to suppress singleton X noise; keep low for sparse pages. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو الـ Digital PDF صحيح لكن Column 3 و4 اندمجوا، غالبًا قلّل <code>minimum_column_gap_px</code> و/أو <code>x_tolerance_px</code> تدريجيًا. لو Description يصنع عشرات الأعمدة الكاذبة، ارفع <code>minimum_column_support_rows</code> أو <code>minimum_column_support_ratio</code>.</p>
+<p>If columns 3 and 4 merge in a valid digital PDF, gradually decrease minimum_column_gap_px and/or x_tolerance_px. If Description creates false columns, increase minimum_column_support_rows or minimum_column_support_ratio.</p>
 
 ---
 
 ### `borderless_spatial`
 
-<p dir="rtl" align="right"><strong>جدول بدون حدود واضحة وتم بناؤه من مواقع الكلمات.</strong> الـ Geometry هنا مثل <code>native_digital_spatial</code> تقريبًا، لكن مصدر Word Boxes قد يكون OCR Recognition بدل النص الرقمي الأصلي.</p>
+<p>This borderless table is reconstructed from word positions. Its geometry resembles native_digital_spatial, but word boxes may originate from OCR recognition rather than native text.</p>
 
 **Think of it as:** `recognized/native word positions without ruling lines → row/column clustering`.
 
@@ -2093,13 +2093,13 @@ When the word boxes came from full OCR, OCR box quality can also affect the stru
 | `ocr.easyocr.width_ths`, `ycenter_ths`, `height_ths` | Controls how EasyOCR groups detected pieces before returning word boxes. |
 | `ocr.easyocr.modes.*` | Per-mode settings for `sparse`, `row`, `single_line`, etc. |
 
-<p dir="rtl" align="right"><strong>تشخيص مهم:</strong> لو Word Boxes نفسها خاطئة أو ناقصة، أصلح OCR Detection/Recognition أولًا. لو Word Boxes صحيحة لكن Rows/Columns غلط، عدّل Borderless spatial parameters فقط.</p>
+<p>If word boxes are wrong or missing, fix OCR detection or recognition first. If word boxes are correct but rows or columns are wrong, tune only borderless spatial parameters.</p>
 
 ---
 
 ### `opencv_anchor_projection` / `anchor_row_segmentation`
 
-<p dir="rtl" align="right"><strong>النظام يستخدم Anchor متكرر لتحديد بداية/مركز كل Record.</strong> الـ Anchor يمكن أن يكون Amount أو Date أو Digit line، ويمكن استخراجه من Projection أو Words/OCR حسب <code>candidate_source</code>. هذه الطريقة أقوى عندما كل Row منطقي يحتوي Anchor ثابت.</p>
+<p>Repeated anchors identify the start or center of each record. An anchor can be an amount, date, or digit line, derived from projection or OCR words according to candidate_source. This works best when every logical row has a stable anchor.</p>
 
 **Think of it as:** `repeated anchor → row bands → configured/inferred columns → cells`.
 
@@ -2146,7 +2146,7 @@ These matter when `candidate_source: projection`:
 
 ### `none`
 
-<p dir="rtl" align="right"><strong>لم تنجح أي طريقة في بناء Structure موثوق للصفحة.</strong> هنا لا يوجد Parameter family واحدة اسمها <code>none</code>. المطلوب هو تحديد أي Stage منع كل الطرق من النجاح.</p>
+<p>No method produced a trustworthy page structure. There is no single parameter family called none; identify the stage that prevented all methods from succeeding.</p>
 
 **Think of it as:** `no reliable structure was built yet`.
 
@@ -2182,13 +2182,13 @@ These matter when `candidate_source: projection`:
 8. If structure_method becomes a real method, move to that method's table above.
 ```
 
-<p dir="rtl" align="right"><strong>ممنوع تبدأ مثلًا بتغيير <code>x_tolerance_px</code> لأن الناتج 0 Columns بينما <code>structure_method = none</code>.</strong> الـ Column clustering لم يحصل أصلًا. أولًا لازم نعرف لماذا لم نصل إلى Rows/Boxes/Grid صالحة.</p>
+<p>Do not adjust x_tolerance_px because there are zero columns when structure_method = none. Column clustering did not run. First determine why there are no valid rows, boxes, or grid.</p>
 
 ---
 
 ### Quick decision rule
 
-<p dir="rtl" align="right">لو وجدت خطأ في الناتج، اقرأ <code>structure_method</code> أولًا ثم عدّل Parameters التابعة لنفس الطريقة. لو تغيّرت <code>structure_method</code> بعد تجربة Parameter، توقف عن الاستمرار بنفس الاتجاه وراجع النتيجة من جديد لأن Detector آخر أصبح هو الفائز.</p>
+<p>When output is wrong, inspect structure_method and tune its own parameters. If structure_method changes after tuning, reevaluate because a different detector now wins.</p>
 
 ```text
 bordered_grid
@@ -2225,11 +2225,11 @@ none
 <a id="toc-4-2-column-errors"></a>
 ## 4.2 Column Detection Errors
 
-<p dir="rtl" align="right">أخطاء اكتشاف الأعمدة تتعلق بعدد الأعمدة ومواقع حدودها وثباتها عبر الصفوف والصفحات. ابدأ من هذا القسم عندما تكون البيانات في الأعمدة الخطأ أو عندما يزيد/ينقص عدد الأعمدة.</p>
+<p>Column detection errors concern column count, boundaries, and consistency between rows and pages. Start here when values occupy incorrect columns or the detected column count is wrong.</p>
 
 ### C1 — Columns merged / undercounted
 
-<p dir="rtl" align="right"><strong>دمج الأعمدة / اكتشاف عدد أعمدة أقل من الصحيح:</strong> يحدث عندما يعتبر النظام عمودين متجاورين عمودًا واحدًا. ستلاحظ أن عدد الأعمدة في الناتج أقل من المصدر وأن قيم عمودين أصبحت داخل حقل واحد؛ غالبًا تحتاج إلى تقليل سماحية الدمج أو فجوة الفصل بحسب طريقة الكشف.</p>
+<p>Merged columns or too few columns occur when adjacent columns are treated as one. The output has fewer columns than the source and combines their values. Usually reduce merging tolerance or adjust separation according to the method.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2241,7 +2241,7 @@ none
 <!-- tuning-recipe:C1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان عدد الأعمدة أقل من الصحيح، قلّل قيم الدمج تدريجيًا. الهدف هو جعل النظام أقل استعدادًا لاعتبار مركزين متجاورين عمودًا واحدًا.</p>
+<p>For too few detected columns, gradually reduce merge tolerances to avoid combining neighboring column centers.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2258,7 +2258,7 @@ none
 
 ### C2 — Columns split / overcounted
 
-<p dir="rtl" align="right"><strong>تقسيم العمود الواحد / اكتشاف أعمدة أكثر من الصحيح:</strong> يحدث عندما يفسر النظام مسافة كبيرة داخل نفس العمود على أنها فاصل بين عمودين. تظهر أعمدة إضافية فارغة أو شبه فارغة أو ينقسم محتوى عمود منطقي إلى أكثر من عمود.</p>
+<p>A split column or too many columns occurs when a gap inside one column is mistaken for a separator. Extra empty or nearly empty columns appear, or one logical column is split.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2270,7 +2270,7 @@ none
 <!-- tuning-recipe:C2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا ظهر عدد أعمدة أكبر من المصدر، اعكس اتجاه C1: اجعل التجميع أكثر تساهلًا حتى تندمج المراكز المكررة/الوهمية بدون دمج أعمدة حقيقية.</p>
+<p>For too many columns, reverse C1: make grouping more permissive to merge duplicate or false centers without merging real columns.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2286,7 +2286,7 @@ none
 
 ### C3 — Column boundary drift across rows
 
-<p dir="rtl" align="right"><strong>انحراف حدود الأعمدة بين الصفوف:</strong> يعني أن مواقع الأعمدة لا تبقى ثابتة من صف إلى آخر، وغالبًا يكون السبب ميل الصفحة أو دورانها. تظهر القيم وكأنها تتنقل بين عمودين متجاورين عبر الصفوف.</p>
+<p>Drifting column boundaries occur when positions change between rows, often due to skew or rotation. Values seem to shift between adjacent columns.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2298,7 +2298,7 @@ none
 <!-- tuning-recipe:C3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">ابدأ بإصلاح ميل الصفحة قبل توسيع سماحية الأعمدة. استخدام Tolerance كبيرة لإخفاء Skew قد يحل صفًا ويكسر صفوفًا أخرى.</p>
+<p>Correct page skew before increasing column tolerance. Large tolerance can conceal skew in one row and break another.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2312,7 +2312,7 @@ none
 
 ### C4 — No columns detected in borderless table
 
-<p dir="rtl" align="right"><strong>عدم اكتشاف أعمدة في جدول بدون حدود:</strong> يظهر عندما يعيد النظام عمودًا واحدًا أو لا يستطيع تكوين أعمدة مستقرة في جدول Borderless. السبب عادة نقص دعم مواقع X المتكررة أو عدم توفر كلمات OCR في وضع يعتمد على Geometry فقط.</p>
+<p>Missing columns in a borderless table occur when the detector returns a single column or cannot build stable columns. Common causes are insufficient repeated X-position support or missing OCR words in a geometry-only mode.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2324,7 +2324,7 @@ none
 <!-- tuning-recipe:C4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عدم وجود أعمدة في Borderless يعني أن أدلة X غير كافية أو شروط قبول الصفوف/الأعمدة صارمة. خففها تدريجيًا حسب الـ structure_method، ولا تغيّر كل المسارات معًا.</p>
+<p>In borderless tables, missing columns signal insufficient X evidence or strict row and column acceptance conditions. Relax the appropriate criteria based on structure_method, not all methods simultaneously.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2341,7 +2341,7 @@ none
 
 ### C5 — False column boundary from noise
 
-<p dir="rtl" align="right"><strong>حد عمود وهمي بسبب الضوضاء:</strong> يحدث عندما تُفهم علامة مائية أو خط عشوائي أو أثر Scan على أنه فاصل عمود حقيقي. النتيجة المعتادة عمود إضافي شبه فارغ لا يقابله عمود في المصدر.</p>
+<p>Noise can create a false column boundary when watermarks, stray lines, or scan artifacts are mistaken for separators, causing an extra mostly empty column.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2353,7 +2353,7 @@ none
 <!-- tuning-recipe:C5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند ظهور عمود وهمي ارفع شروط الدليل بدل حذف الأعمدة يدويًا. الهدف أن يحتاج العمود إلى دعم من صفوف أكثر أو خطوط أطول قبل قبوله.</p>
+<p>For false columns, increase evidence requirements instead of manually deleting columns. Require stronger row support or longer lines.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2369,7 +2369,7 @@ none
 
 ### C6 — Wrapped cell text becomes adjacent column
 
-<p dir="rtl" align="right"><strong>النص الملتف داخل الخلية انتقل إلى عمود مجاور:</strong> يحدث عندما يُفسر السطر الثاني من خلية متعددة الأسطر كجزء من عمود آخر. راجع تجميع الصفوف أولًا ثم سماحية X وحدود الأعمدة.</p>
+<p>Wrapped text moved into an adjacent column means the second line of a multiline cell was assigned elsewhere. Review row grouping before X tolerance and column boundaries.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2381,7 +2381,7 @@ none
 <!-- tuning-recipe:C6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">هذه المشكلة غالبًا تبدأ من تجميع الصفوف قبل الأعمدة. اجعل السطر الثاني أقرب منطقيًا للصف السابق أولًا، ثم عدّل X فقط إذا بقيت المشكلة.</p>
+<p>This often starts with row grouping rather than column detection. Associate the continuation line with its original row before tuning X.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2395,7 +2395,7 @@ none
 
 ### C7 — Column count varies page to page
 
-<p dir="rtl" align="right"><strong>عدد الأعمدة يختلف من صفحة لأخرى:</strong> يعني أن Geometry المناسبة لصفحة لا تصلح لكل الصفحات. افحص الصفحات بشكل مستقل واستخدم <code>page_overrides</code> عند وجود Templates مختلفة بدل فرض حدود ثابتة عالميًا.</p>
+<p>Different page layouts can cause column counts to vary. Inspect pages independently and use page_overrides for distinct templates instead of imposing global fixed boundaries.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2407,7 +2407,7 @@ none
 <!-- tuning-recipe:C7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا تحاول حل اختلاف Templates بقيمة عالمية واحدة. استخدم Page Overrides للصفحات المختلفة، واحفظ القيم العامة Generic.</p>
+<p>Do not solve differing templates with one global value. Use page overrides for differing pages and keep the default generic.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2420,7 +2420,7 @@ none
 
 ### C8 — Numeric/text alignment inconsistency
 
-<p dir="rtl" align="right"><strong>اختلاف محاذاة الأعمدة الرقمية والنصية:</strong> تظهر المشكلة عندما تنجح الأعمدة النصية بينما تندمج أو تنقسم الأعمدة الرقمية بسبب اختلاف المحاذاة يمين/يسار. الحل الأفضل قد يتطلب حدودًا صريحة أو منطقًا خاصًا بحسب نوع العمود.</p>
+<p>Numeric and text columns may differ in alignment, causing numeric columns to merge or split while textual columns succeed. Explicit boundaries or column-aware logic may be needed.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2432,7 +2432,7 @@ none
 <!-- tuning-recipe:C8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">الأعمدة الرقمية Right-aligned قد تغيّر مراكز X مقارنة بالنصوص. استخدم الـ word-height-aware tolerance قبل زيادة Pixel tolerance بشكل كبير.</p>
+<p>Right-aligned numeric columns have different X centers. Use word-height-aware tolerance before making large pixel-tolerance increases.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2446,7 +2446,7 @@ none
 
 ### C9 — Merged header cells reduce header count
 
-<p dir="rtl" align="right"><strong>Header مدمج يقلل عدد أعمدة العنوان:</strong> يحدث عندما يحتوي Header على <code>colspan</code> أو خلايا مدمجة، فيكون عدد خلاياه المرئية أقل من عدد أعمدة البيانات. لا يجب ربط Header بالـ body اعتمادًا على العدد فقط؛ الموضع الهندسي أهم.</p>
+<p>Merged header cells reduce the visible header column count. colspan can make it smaller than the data column count, so geometric position is more important than equal counts for header-body mapping.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2458,7 +2458,7 @@ none
 <!-- tuning-recipe:C9 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Header colspan ليست مشكلة Tolerance رقمية أساسًا. لا تجبر عدد أعمدة الـHeader ليطابق الـData؛ افصل Header mapping عن Body geometry.</p>
+<p>Header colspan is not primarily a numeric tolerance problem. Do not force header and data counts to match; separate header mapping from body geometry.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2473,11 +2473,11 @@ none
 <a id="toc-4-3-row-errors"></a>
 ## 4.3 Row Detection Errors
 
-<p dir="rtl" align="right">أخطاء اكتشاف الصفوف تتعلق بدمج سجلين معًا أو تقسيم سجل واحد أو التعامل الخاطئ مع Header/Footer والصفوف متعددة الأسطر أو الجداول الممتدة عبر صفحات.</p>
+<p>Row detection errors include merged records, split records, incorrect headers and footers, multiline rows, and multi-page continuations.</p>
 
 ### R1 — Rows merged
 
-<p dir="rtl" align="right"><strong>دمج صفين أو أكثر في صف واحد:</strong> يحدث عندما تكون المسافة الرأسية بين سجلين صغيرة فيتعامل النظام معهما كسجل واحد. النتيجة صف يحتوي بيانات سجلين متتاليين.</p>
+<p>Multiple records may merge when their vertical gap is small, producing a row containing data from successive records.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2489,7 +2489,7 @@ none
 <!-- tuning-recipe:R1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند دمج صفين، اجعل التجميع الرأسي أكثر صرامة: قلّل سماحية الـbaseline والـcontinuation والـrow merge خطوة بخطوة.</p>
+<p>To separate merged rows, gradually reduce baseline, continuation, and row-merge tolerances.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2505,7 +2505,7 @@ none
 
 ### R2 — Rows split
 
-<p dir="rtl" align="right"><strong>تقسيم سجل واحد إلى أكثر من صف:</strong> يحدث غالبًا بسبب نص ملتف أو خلية متعددة الأسطر يتم تفسير سطرها الثاني كسجل جديد. يظهر صف إضافي يحتوي جزءًا من البيانات وتكون بقية خلاياه فارغة.</p>
+<p>A record may split into multiple rows when wrapped text or a multiline cell's second line is interpreted as a new record, leaving a partial extra row.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2517,7 +2517,7 @@ none
 <!-- tuning-recipe:R2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند تقسيم صف واحد إلى صفين، اعكس R1: زِد سماحية التجميع تدريجيًا حتى تلتصق الأسطر التابعة لنفس السجل بدون دمج سجلين مختلفين.</p>
+<p>For split rows, reverse R1 by gradually increasing grouping tolerances until continuation lines join their original record without merging unrelated records.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2533,7 +2533,7 @@ none
 
 ### R3 — Header misclassified
 
-<p dir="rtl" align="right"><strong>تصنيف Header بشكل خاطئ:</strong> يعني أن عنوان الأعمدة دخل ضمن البيانات أو أن أول صف بيانات حقيقي تم اعتباره Header وحذفه. راجع كلمات Header وقواعد إزالة العناوين المكررة.</p>
+<p>Incorrect header classification places column titles in data or drops the first true data row as a header. Inspect header keywords and repeated-header rules.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2545,7 +2545,7 @@ none
 <!-- tuning-recipe:R3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Header classification يتم أساسًا بالـkeywords والبنية، وليس بتغيير Gap عشوائي. أضف كلمات الـHeader الفعلية إذا لم يتعرف عليها النظام.</p>
+<p>Header classification depends mainly on keywords and structure, not arbitrary gap changes. Add actual header keywords when needed.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2559,7 +2559,7 @@ none
 
 ### R4 — Blank rows dropped/created
 
-<p dir="rtl" align="right"><strong>حذف صفوف فارغة صحيحة أو إنشاء صفوف فارغة وهمية:</strong> يظهر عندما لا يتطابق عدد الصفوف مع المصدر بسبب Noise أو لأن المسار القائم على الكلمات لا يستطيع تمثيل صف خالٍ من النص. يحتاج أحيانًا إلى تمثيل صريح لحالة الصف الفارغ.</p>
+<p>Valid blank rows may disappear, or false blank rows appear, because of noise or the inability of word-driven methods to represent textless rows. Explicit blank-row state may be required.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2571,7 +2571,7 @@ none
 <!-- tuning-recipe:R4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">هذا الخطأ له اتجاهان مختلفان: إذا كانت الصفوف الحقيقية Sparse تُحذف فخفف شروط Row support؛ إذا كان Noise يُنشئ صفوفًا وهمية فارفع الشروط.</p>
+<p>These require opposite adjustments: relax row support if sparse real rows disappear, but tighten it if noise creates spurious rows.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2584,7 +2584,7 @@ none
 
 ### R5 — Skewed scan zigzags rows
 
-<p dir="rtl" align="right"><strong>ميل الصفحة يجعل خطوط الصفوف متعرجة:</strong> يحدث عندما لا يتم تصحيح Skew بدقة، فتتحرك Baselines لأعلى وأسفل عبر عرض الصفحة ويصبح فصل الصفوف غير ثابت.</p>
+<p>Skew may cause zigzag row baselines when deskew is inadequate, destabilizing row separation across page width.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2596,7 +2596,7 @@ none
 <!-- tuning-recipe:R5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">أصلح Deskew أولًا. لا تعالج Zigzag بتكبير Row/Column tolerances لأن ذلك قد يخفي الميل ويخلق دمجًا خاطئًا.</p>
+<p>Fix deskew first; do not mask zigzag baselines by inflating row or column tolerances and creating false merges.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2609,7 +2609,7 @@ none
 
 ### R6 — Variable row height mishandled
 
-<p dir="rtl" align="right"><strong>عدم التعامل الصحيح مع اختلاف ارتفاع الصفوف:</strong> يحدث عندما تكون بعض الصفوف متعددة الأسطر أو أكبر من غيرها بينما تعتمد الإعدادات على سماحية واحدة. قد ينقسم صف أو يندمج مع الصف التالي.</p>
+<p>Variable-height or multiline rows may split or merge if a single fixed grouping tolerance is used.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2621,7 +2621,7 @@ none
 <!-- tuning-recipe:R6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">للصفوف متغيرة الارتفاع، زِد فقط سماحية continuation/line grouping المطلوبة للنص الملتف. إذا احتجت قيمًا مبالغًا فيها فانتقل إلى Anchor/content clustering بدل fixed-height assumptions.</p>
+<p>Increase only continuation or line-grouping tolerance needed for wrapped text. If very large values are needed, prefer anchor or content clustering over fixed-height assumptions.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2635,7 +2635,7 @@ none
 
 ### R7 — Footer/summary rows treated as data
 
-<p dir="rtl" align="right"><strong>اعتبار Footer أو Summary صف بيانات:</strong> يظهر عندما تدخل الإجماليات أو تذييل الصفحة أو نصوص النهاية ضمن Records العادية. يجب تمييزها بنيويًا أو استبعادها عند التصدير حسب المطلوب.</p>
+<p>Footer or summary content can be misclassified as data records. Distinguish it structurally or exclude it on export as appropriate.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2647,7 +2647,7 @@ none
 <!-- tuning-recipe:R7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لمنع Footer من التحول إلى Data، ارفع الاتساق المطلوب للصفوف أو افصل الكتلة السفلية عندما توجد فجوة كبيرة. لا تحذف آخر N صفوف بشكل ثابت.</p>
+<p>To prevent footer content being treated as data, strengthen row consistency or separate the lower block across a large gap. Do not blindly drop the last N rows.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2661,7 +2661,7 @@ none
 
 ### R8 — Multi-page table continuation not linked
 
-<p dir="rtl" align="right"><strong>عدم ربط استمرار الجدول عبر الصفحات:</strong> يعني أن الجزء الموجود في الصفحة التالية يُعامل كجدول مستقل رغم أنه استمرار لنفس الجدول. هذه القدرة تحتاج Cross-page continuation logic في الكود الحالي.</p>
+<p>Cross-page table continuations are currently treated as independent tables, requiring cross-page linking logic in code.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2673,7 +2673,7 @@ none
 <!-- tuning-recipe:R8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا يوجد Parameter رقمي يربط الصفحات حاليًا. لا تضيع وقتًا في تغيير Tolerances؛ هذه وظيفة Cross-page state تحتاج Code enhancement.</p>
+<p>No numeric parameter can link pages. Changing tolerances will not implement cross-page state; code enhancement is required.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2685,7 +2685,7 @@ none
 
 ### R9 — Crop-only returns zero rows/cells despite visible table
 
-<p dir="rtl" align="right"><strong>وضع القص يعمل لكن لا ينتج أي Rows أو Cells رغم وجود جدول واضح:</strong> في v3.1 يجب أن يمر Crop-only على أكثر من مصدر Geometry بدل الاعتماد على OCR. إذا بقي الناتج صفرًا فالمطلوب تحديد أي Evidence فشل: الخطوط التقليدية، الخلايا المظللة، أو Projection الخاص بالـ Borderless.</p>
+<p>Crop-only mode may produce no rows or cells despite a clear table. Since v3.1, it should consider multiple geometry sources; investigate ruled lines, shaded cells, and borderless projection to identify failed evidence.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2697,7 +2697,7 @@ none
 <!-- tuning-recipe:R9 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان Crop-only يعطي 0 صفوف/خلايا، لا تبدأ من Column tolerance. حدد أول Stage فشل: ruled lines، shaded grid، projection، ثم detection-only CRAFT. خفف فقط المسار الذي لم يجد Evidence كافية.</p>
+<p>If crop-only yields zero rows or cells, identify which stage failed: ruled lines, shaded grid, projection, or detection-only CRAFT. Do not begin by changing column tolerance.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2716,11 +2716,11 @@ none
 <a id="toc-4-4-cell-errors"></a>
 ## 4.4 Cell Detection Errors
 
-<p dir="rtl" align="right">أخطاء الخلايا تظهر بعد تحديد الصفوف والأعمدة، مثل Crop غير صحيح، خلايا مدمجة، خلايا فارغة غير واضحة، نص مائل/عمودي، أو OCR غير دقيق داخل خلية صحيحة.</p>
+<p>Cell errors include wrong crops, merged or ambiguous blank cells, rotated text, and poor OCR within correctly detected geometry.</p>
 
 ### CELL1 — No cell boundary in borderless table
 
-<p dir="rtl" align="right"><strong>عدم وجود حدود خلية في جدول بدون خطوط:</strong> في الجداول Borderless لا توجد خطوط فعلية لكل خلية، لذلك يجب اشتقاق الخلايا من تقاطع حدود الصفوف والأعمدة المنطقية بدل انتظار Contour مستقل لكل خلية.</p>
+<p>Borderless tables lack explicit cell outlines. Derive cells from logical row bands intersecting column boundaries instead of requiring independent contours.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2732,7 +2732,7 @@ none
 <!-- tuning-recipe:CELL1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Borderless cells تأتي من تقاطع Row bands مع Column boundaries، لذلك عدّل الـdetector الذي أنتج الـStructure بدل البحث عن contour لكل خلية.</p>
+<p>Borderless cells are intersections of row bands and column boundaries; tune the structure-producing detector instead of looking for each cell contour.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2747,7 +2747,7 @@ none
 
 ### CELL2 — Merged cells rowspan/colspan misalign grid
 
-<p dir="rtl" align="right"><strong>الخلايا المدمجة تفسد محاذاة الشبكة:</strong> يحدث عند وجود <code>rowspan</code> أو <code>colspan</code> بينما يفترض النظام شبكة موحدة. بعد الخلية المدمجة قد تتحرك البيانات إلى عمود أو صف غير صحيح.</p>
+<p>Merged rowspan or colspan cells disrupt a uniform grid, potentially shifting subsequent values into wrong rows or columns.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2759,7 +2759,7 @@ none
 <!-- tuning-recipe:CELL2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا يوجد Span model حاليًا؛ تغيير Tolerances قد يخفي المشكلة لكنه لن يفهم rowspan/colspan بشكل صحيح.</p>
+<p>There is no span model currently. Tolerances can obscure the issue but cannot correctly interpret rowspan or colspan.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2771,7 +2771,7 @@ none
 
 ### CELL3 — Ambiguous empty cell
 
-<p dir="rtl" align="right"><strong>خلية فارغة أم فشل OCR؟:</strong> المشكلة أن قيمة فارغة في الناتج لا توضح هل المصدر فارغ فعلًا أم أن OCR حاول ولم يقرأ النص. الحل الكامل يحتاج حالة Metadata منفصلة للفراغ المؤكد وفشل القراءة.</p>
+<p>Empty output cannot distinguish a genuinely blank cell from an OCR failure. A complete solution needs separate metadata states for confirmed blanks and recognition failures.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2783,7 +2783,7 @@ none
 <!-- tuning-recipe:CELL3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Confidence threshold لا يستطيع وحده إثبات أن الخلية فارغة فعلًا. لا تخفضه فقط لإخفاء Empty OCR؛ المطلوب Metadata يفرق بين confirmed blank وOCR miss.</p>
+<p>Confidence threshold alone does not establish a true blank. Do not lower it to conceal OCR misses; record confirmed blank and OCR failure separately.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2796,7 +2796,7 @@ none
 
 ### CELL4 — Crop margin too tight
 
-<p dir="rtl" align="right"><strong>هامش Crop ضيق جدًا:</strong> يقطع جزءًا من الحروف القريبة من حدود الخلية، فتظهر قيم ناقصة خصوصًا أول أو آخر حرف. زد Padding تدريجيًا مع مراجعة الـ crop.</p>
+<p>Too-narrow crop margins clip edge characters and truncate values, particularly first or last letters. Increase padding gradually while inspecting crops.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2808,7 +2808,7 @@ none
 <!-- tuning-recipe:CELL4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان أول/آخر حرف مقطوعًا، زِد Padding في الجهة المقطوعة فقط وبخطوات صغيرة. لا تزِد الأربع جهات تلقائيًا.</p>
+<p>When edge characters are clipped, increase padding only on the affected side, using small steps.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2823,7 +2823,7 @@ none
 
 ### CELL5 — Crop margin too wide
 
-<p dir="rtl" align="right"><strong>هامش Crop واسع جدًا:</strong> يدخل جزءًا من محتوى الخلية المجاورة داخل الصورة الحالية، فيقرأ OCR نصين معًا. قلل Padding وتأكد من عدم تداخل الصناديق.</p>
+<p>Too-wide crop margins capture neighboring cell content, causing OCR to read two cells together. Reduce padding and check overlaps.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2835,7 +2835,7 @@ none
 <!-- tuning-recipe:CELL5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا دخل نص الجار في الـCrop، قلّل Padding في الجهة التي يحدث منها التسريب فقط.</p>
+<p>If adjacent text leaks into a crop, reduce padding only on the leaking side.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2849,7 +2849,7 @@ none
 
 ### CELL6 — OCR misreads correct crop
 
-<p dir="rtl" align="right"><strong>OCR يخطئ رغم أن Crop صحيح:</strong> إذا كانت حدود الخلية سليمة لكن النص الناتج خاطئ، فالمشكلة انتقلت إلى جودة الصورة أو DPI أو Preprocessing أو إعدادات/نموذج OCR، وليس إلى Geometry.</p>
+<p>If the crop is correct but OCR is wrong, investigate DPI, image quality, preprocessing, and OCR recognition settings or model rather than geometry.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2861,7 +2861,7 @@ none
 <!-- tuning-recipe:CELL6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا تغيّر OCR قبل إثبات أن Crop صحيح. بعد ذلك ارفع جودة الصورة تدريجيًا، ثم جرّب Recognition settings؛ لا تبدأ بنموذج مخصص مباشرة.</p>
+<p>Confirm correct crops before changing OCR. Improve image quality gradually, then test recognition settings; do not immediately train a custom model.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2878,7 +2878,7 @@ none
 
 ### CELL7 — Rotated/vertical text misread
 
-<p dir="rtl" align="right"><strong>النص المدور أو الرأسي لا يُقرأ:</strong> يظهر في خلايا ذات اتجاه مختلف عن بقية الصفحة، مثل Header رأسي. يمكن تجربة <code>rotation_info</code>، لكن المعالجة الدقيقة لكل خلية تحتاج Orientation stage مخصص.</p>
+<p>Vertical or rotated text may be unreadable, especially vertical headers. rotation_info may help, but reliable per-cell orientation handling requires a dedicated stage.</p>
 
 | Diagnostic field | Details |
 |---|---|
