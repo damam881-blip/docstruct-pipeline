@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-<p dir="rtl" align="right"><strong>الفهرس:</strong> استخدم الروابط التالية للانتقال مباشرة إلى القسم المطلوب داخل الدليل.</p>
+<p>Contents: Use the following links to navigate directly to the relevant section of this guide.</p>
 
 - [0. Source-of-truth and current audit status](#toc-0-source-of-truth)
 - [1. First opening in VS Code — exact onboarding sequence](#toc-1-onboarding)
@@ -69,14 +69,14 @@
 
 ---
 
-<p dir="rtl" align="right">هذا هو الدليل الرئيسي لتسليم وتشغيل ومعالجة أخطاء نظام استخراج بيانات الـ PDF. يبدأ مع المطوّر من فتح المشروع في VS Code وينتهي بالتشغيل الكامل، التشخيص، ضبط الإعدادات، ومعرفة متى يحتاج الأمر إلى تعديل في الكود.</p>
+<p>This is the main guide for handing off, operating, and troubleshooting the PDF data extraction system. It takes a developer from opening the project in VS Code through full execution, diagnostics, configuration tuning, and determining when source-code changes are needed.</p>
 
 > **Purpose:** This is the developer-facing front door for the workspace. A developer should be able to open the project in VS Code, verify the environment/model setup, process a new PDF, diagnose geometry/OCR failures, tune the correct parameter, and know when a source-code change is required.
 
 <a id="toc-0-source-of-truth"></a>
 ## 0. Source-of-truth and current audit status
 
-<p dir="rtl" align="right">يوضح هذا القسم ما هي الملفات التي اعتُمد عليها كمصدر للحقيقة أثناء مراجعة المشروع، وما هي حالة الاختبارات والملاحظات المؤكدة على النسخة الحالية من الكود.</p>
+<p>This section identifies the files treated as sources of truth during the project review, together with test status and findings confirmed against the current code.</p>
 
 This guide was built from the current workspace sources: `main.py`, `config.py`, `models.py`, `configs/default.yaml`, all `pipeline/*.py`, `tests/*.py`, `tools/*.py`, and the existing docs.
 
@@ -93,7 +93,7 @@ The current baseline has also completed a real three-page full E2E regression on
 
 ### Important current-source findings
 
-<p dir="rtl" align="right">ملخص لأهم النتائج التي ظهرت من مراجعة الكود الحالي، بما في ذلك السلوك الفعلي للـ Pipeline والخصائص التي تم إصلاحها أو ما زالت تحتاج تطويرًا.</p>
+<p>A summary of the most important findings from reviewing the current code, including actual pipeline behavior, implemented fixes, and features that still need improvement.</p>
 
 1. **The project is generic by design.** There are no bank/company/file-name profiles in the current source; configuration is resolved generically.
 2. **Actual engine precedence is:** CLI `--override` → `page_overrides` → JSON `--run-config` → base YAML. **However, the standard developer workflow in this guide intentionally does not use `--override`.** For normal work, change global/default values in YAML and PDF-specific values in the generated JSON.
@@ -124,12 +124,12 @@ The current baseline has also completed a real three-page full E2E regression on
 <a id="toc-1-onboarding"></a>
 # 1. First opening in VS Code — exact onboarding sequence
 
-<p dir="rtl" align="right">هذا القسم هو نقطة البداية لأي مطوّر يفتح المشروع لأول مرة. اتبع الخطوات بالترتيب للتأكد من أن مجلد المشروع، Python، البيئة الافتراضية، مكتبات OCR، والنماذج جاهزة قبل تعديل أي Parameter.</p>
+<p>This section is the starting point for developers opening the project for the first time. Follow the steps in order to verify that the project directory, Python, virtual environment, OCR libraries, and models are ready before changing any parameter.</p>
 
 <a id="toc-1-1-open-folder"></a>
 ## 1.1 Open the correct folder
 
-<p dir="rtl" align="right">تأكد أن VS Code مفتوح على جذر المشروع بالكامل، وليس على مجلد فرعي مثل <code>pipeline</code> أو <code>docs</code>، لأن الأوامر والمسارات النسبية تعتمد على تشغيلها من جذر المشروع.</p>
+<p>Make sure VS Code is open at the entire project root rather than a subfolder such as pipeline or docs, because commands and relative paths assume execution from the project root.</p>
 
 Open the project root itself — the folder that contains:
 
@@ -151,7 +151,7 @@ Do **not** open only `pipeline/` or only `docs/` as the VS Code workspace root.
 <a id="toc-1-2-python-interpreter"></a>
 ## 1.2 Verify the VS Code Python interpreter
 
-<p dir="rtl" align="right">تأكد أن VS Code يستخدم Python الموجود داخل <code>.venv</code> الخاصة بالمشروع؛ استخدام Python آخر قد يؤدي إلى اختلاف المكتبات أو ظهور أخطاء Import غير حقيقية.</p>
+<p>Make sure VS Code uses the Python interpreter inside the project's .venv. Another interpreter may have different dependencies or cause misleading import errors.</p>
 
 The uploaded `.vscode/settings.json` only declares the venv environment manager; it does not pin an absolute interpreter path. In VS Code:
 
@@ -173,7 +173,7 @@ Expected: `sys.executable` points inside this workspace's `.venv`.
 <a id="toc-1-3-venv"></a>
 ## 1.3 Preflight the existing `.venv`
 
-<p dir="rtl" align="right">افحص البيئة الافتراضية الموجودة أولًا بدل إنشائها من جديد. الهدف هو التأكد من سلامة Python والمكتبات المثبتة وعدم وجود تعارضات في Dependencies.</p>
+<p>Inspect the existing virtual environment before creating a new one. The objective is to verify Python and installed dependencies and detect dependency conflicts.</p>
 
 Because `.venv` is intentionally not committed/uploaded, verify it before installing anything:
 
@@ -207,7 +207,7 @@ Only install training helper dependencies when you actually need the training-da
 <a id="toc-1-4-easyocr-models"></a>
 ## 1.4 Preflight the EasyOCR model directories
 
-<p dir="rtl" align="right">تحقق من وجود مجلدات وملفات نماذج EasyOCR القياسية أو المخصصة في المسارات المتوقعة قبل تشغيل OCR، حتى لا تفسر مشكلة Model على أنها مشكلة في الـ Pipeline.</p>
+<p>Check that standard or custom EasyOCR model directories and files exist at the expected paths before running OCR, so model problems are not mistaken for pipeline failures.</p>
 
 The current default config expects:
 
@@ -248,7 +248,7 @@ Do not assume a model is healthy merely because the directory exists; the first 
 <a id="toc-1-5-tests"></a>
 ## 1.5 Run the unit test suite before touching parameters
 
-<p dir="rtl" align="right">شغّل الاختبارات قبل أي تعديل حتى تعرف هل المشروع سليم أساسًا. إذا فشلت الاختبارات قبل التعديل، عالج المشكلة أولًا ولا تبدأ Tuning على PDF جديد.</p>
+<p>Run tests before making changes to establish whether the project is healthy. If tests already fail, resolve those failures before tuning a new PDF.</p>
 
 ```powershell
 python -m pytest -q
@@ -259,7 +259,7 @@ Treat new failures here as code/environment problems, not PDF tuning problems.
 <a id="toc-1-6-no-ocr-smoke"></a>
 ## 1.6 Run a no-OCR analysis smoke test
 
-<p dir="rtl" align="right">نفّذ تحليلًا سريعًا لا يعتمد على OCR للتأكد من أن قراءة PDF والتحليل الأساسي يعملان قبل إدخال طبقة التعرف الضوئي على النصوص.</p>
+<p>Run a quick analysis without OCR to verify PDF reading and basic analysis before introducing optical character recognition.</p>
 
 ```powershell
 python .\main.py analyze `
@@ -273,7 +273,7 @@ This verifies PyMuPDF/OpenCV analysis without requiring a full OCR extraction.
 <a id="toc-1-7-ocr-smoke"></a>
 ## 1.7 Run an OCR smoke test on one representative page
 
-<p dir="rtl" align="right">اختبر OCR على صفحة واحدة ممثلة للملف بدل تشغيل المستند كله. هذه الخطوة تكشف مشاكل النموذج، GPU/CPU، اللغة، أو الإعدادات بأقل وقت ممكن.</p>
+<p>Test OCR on one representative page rather than processing the entire document. This quickly exposes model, GPU/CPU, language, or configuration problems.</p>
 
 Before this OCR smoke test, set the desired mode in `configs/default.yaml`. For a full OCR smoke test use:
 
@@ -303,18 +303,18 @@ If this fails while analysis succeeded, inspect the OCR/model section of this gu
 <a id="toc-2-new-pdf-workflow"></a>
 # 2. The normal workflow for every new PDF
 
-<p dir="rtl" align="right">هذه هي دورة العمل القياسية التي يجب اتباعها مع كل PDF جديد: تحليل → تشخيص → اختبار صفحة → مراجعة Geometry → تعديل Parameter واحد → حفظ الإعدادات → ثم التوسع لباقي الصفحات.</p>
+<p>For every new PDF, follow this standard workflow: analyze, diagnose, test one page, inspect geometry, change one parameter, save configuration, and then expand to the remaining pages.</p>
 
 Use this exact loop instead of editing Python code immediately.
 
 <a id="toc-2-config-inputs"></a>
 ## 2.1 Config files: active YAML, reference YAML, backup, and generated JSON
 
-<p dir="rtl" align="right">من المهم الفصل بين ملف الـ PDF وملفات الإعدادات. الخيار <code>--input</code> يستقبل ملف PDF فقط. ملف YAML الأساسي يدخل من <code>--config</code>، وملف JSON الناتج من تشغيل سابق يدخل من <code>--run-config</code>. لا يتم تمرير YAML أو JSON داخل <code>--input</code>.</p>
+<p>Keep PDF input separate from configuration files. --input accepts only a PDF; --config supplies the base YAML, and --run-config supplies JSON generated by a previous run. Never pass YAML or JSON through --input.</p>
 
 ### Which YAML file do I edit?
 
-<p dir="rtl" align="right">في العمل اليومي يوجد ملف YAML واحد فقط تعتبره Active وهو <code>configs/default.yaml</code>. ملف <code>default_v3.2.0.reference.yaml</code> مرجع احتياطي لإعدادات v3.2 الأصلية ولا يدخل في التشغيل إلا إذا مررته أنت صراحةً إلى <code>--config</code>. ملف <code>default.yaml.pre_v3_2_0.bak</code> هو نسخة احتياطية قبل الترقية فقط.</p>
+<p>For day-to-day work, the only active YAML is configs/default.yaml. default_v3.2.0.reference.yaml is a backup reference for the original v3.2 settings and is not used unless explicitly passed to --config. default.yaml.pre_v3_2_0.bak is solely a pre-upgrade backup.</p>
 
 | Workspace file | Role | Edit during normal work? | Used automatically? |
 |---|---|---:|---:|
@@ -333,7 +333,7 @@ Use this exact loop instead of editing Python code immediately.
 
 ### First run — YAML is the configuration source
 
-<p dir="rtl" align="right">في أول تشغيل استخدم ملف <code>configs/default.yaml</code> كإعداد أساسي، وحدد الـ PDF في <code>--input</code>. بعد نجاح التشغيل سيُنشئ النظام ملف <code>*.run_config.json</code> تلقائيًا ما لم تستخدم <code>--no-save-run-config</code>.</p>
+<p>On the first run, use configs/default.yaml as the base configuration and supply the PDF via --input. After a successful run, the system automatically creates *.run_config.json unless --no-save-run-config was specified.</p>
 
 ```powershell
 python .\main.py extract `
@@ -359,7 +359,7 @@ document.pdf          ──> --input
 
 ### Later runs — JSON becomes the PDF-specific working configuration
 
-<p dir="rtl" align="right">بعد إنشاء ملف الـ JSON، عدّل القيم داخل الكائن <code>config</code> في هذا الملف. في التشغيل التالي مرّر نفس الـ YAML كـ Base عن طريق <code>--config</code>، ومرّر الـ JSON المعدّل عن طريق <code>--run-config</code>. يظل <code>--input</code> مخصصًا للـ PDF فقط.</p>
+<p>After generating JSON, edit values inside its config object. For the next run, supply the same base YAML through --config and the modified JSON through --run-config. --input remains reserved for the PDF.</p>
 
 ```powershell
 python .\main.py extract `
@@ -396,7 +396,7 @@ For `output.mode` specifically:
 
 ### Verify the effective mode before a real extraction
 
-<p dir="rtl" align="right">قبل أي تشغيل مهم تأكد من الـ Mode الذي سيستخدمه البرنامج فعليًا. لا تعتمد على اسم ملف الـ Output أو على ما تتذكر أنك عدّلته. إذا كنت تستخدم YAML فقط افحصه مباشرة، وإذا كنت تستخدم JSON مرّره أيضًا إلى <code>inspect-config</code>.</p>
+<p>Before any important run, verify which output mode will actually be used. Do not rely on the output filename or your memory of edits. Inspect YAML directly, or pass the JSON to inspect-config as well.</p>
 
 YAML only:
 
@@ -484,7 +484,7 @@ in a full run means recognized/native word positions participated in borderless 
 <a id="toc-2-step-a"></a>
 ## Step A — Analyze representative pages
 
-<p dir="rtl" align="right">ابدأ بتحليل صفحات ممثلة لأنواع التخطيط الموجودة في الملف لفهم هل الصفحات Digital أو Scanned وما نوع الجداول قبل بدء الاستخراج الفعلي.</p>
+<p>Start by analyzing pages representative of different layouts to determine whether they are digital or scanned and identify table types before extraction.</p>
 
 For a short PDF, analyze all pages. For a large PDF, start with page 1, a middle page, and the last page.
 
@@ -500,7 +500,7 @@ Do not use `--fast` when you need line/layout evidence; `--fast` intentionally s
 <a id="toc-2-step-b"></a>
 ## Step B — Ask the built-in advisor for measurement-based suggestions
 
-<p dir="rtl" align="right">استخدم أمر <code>diagnose</code> للحصول على اقتراحات مبنية على القياسات الفعلية للصفحة بدل اختيار Parameters بالتخمين.</p>
+<p>Use diagnose to obtain recommendations based on actual page measurements instead of guessing parameters.</p>
 
 ```powershell
 python .\main.py diagnose `
@@ -514,7 +514,7 @@ Treat advisor output as suggestions only. `digital_text.fallback_to_ocr_when_gar
 <a id="toc-2-step-c"></a>
 ## Step C — Extract one representative page with debug artifacts
 
-<p dir="rtl" align="right">نفّذ استخراجًا لصفحة واحدة مع Debug Artifacts حتى تستطيع رؤية الحدود والصفوف والأعمدة والـ crops التي اعتمد عليها النظام.</p>
+<p>Extract one page with debug artifacts so you can inspect the detected boundaries, rows, columns, and crops.</p>
 
 Before running, choose `output.mode` in `configs/default.yaml` for this first run. Then:
 
@@ -545,7 +545,7 @@ This also creates an editable `*.run_config.json` unless `--no-save-run-config` 
 <a id="toc-2-step-d"></a>
 ## Step D — Inspect geometry before OCR text
 
-<p dir="rtl" align="right">راجع هندسة الجدول أولًا قبل الحكم على OCR. إذا كان Crop أو حدود الصفوف/الأعمدة خاطئًا، فلن يستطيع أفضل OCR إصلاح البيانات الناتجة.</p>
+<p>Inspect table geometry before evaluating OCR. Even excellent OCR cannot repair data generated from incorrect crops or row/column boundaries.</p>
 
 Inspect in this order:
 
@@ -573,7 +573,7 @@ page_report.json
 <a id="toc-2-step-e"></a>
 ## Step E — Edit one parameter in the generated JSON
 
-<p dir="rtl" align="right">بعد أول تشغيل، استخدم ملف <code>*.run_config.json</code> كملف العمل الخاص بهذا الـ PDF. عدّل Parameter واحدًا فقط في كل تجربة حتى تعرف بالضبط أي تغيير أدى إلى التحسن أو التدهور.</p>
+<p>After the first run, use *.run_config.json as the working configuration for that PDF. Change one parameter per experiment to identify precisely what improved or degraded the result.</p>
 
 Open:
 
@@ -622,7 +622,7 @@ Do not change several unrelated parameters in one trial.
 <a id="toc-2-step-f"></a>
 ## Step F — Re-run using YAML + JSON
 
-<p dir="rtl" align="right">في التشغيل التالي استخدم <code>--config</code> لملف YAML الأساسي و<code>--run-config</code> لملف JSON المعدّل. ملف الـ PDF نفسه يظل دائمًا في <code>--input</code>.</p>
+<p>On subsequent runs, pass the base YAML using --config and the modified JSON using --run-config. Always supply the PDF itself through --input.</p>
 
 ```powershell
 python .\main.py extract `
@@ -648,7 +648,7 @@ The engine still supports CLI `--override` as a highest-priority compatibility/a
 <a id="toc-2-step-g"></a>
 ## Step G — Use `tune` for a single numeric parameter when useful
 
-<p dir="rtl" align="right">استخدم أمر <code>tune</code> لمقارنة عدة قيم لباراميتر رقمي واحد بطريقة قابلة للقياس عندما لا يكون الاختيار البصري وحده كافيًا.</p>
+<p>Use tune to compare multiple values of a single numeric parameter in a measurable way when visual inspection alone is insufficient.</p>
 
 ```powershell
 python .\main.py tune `
@@ -664,7 +664,7 @@ Never accept the top score blindly; visually inspect the winning geometry.
 <a id="toc-2-step-h"></a>
 ## Step H — Scale to the whole PDF only after representative pages are correct
 
-<p dir="rtl" align="right">لا تشغّل كل صفحات الملف إلا بعد التأكد من نجاح الصفحات الممثلة. هذا يقلل وقت التجربة ويمنع إنتاج كمية كبيرة من نتائج خاطئة.</p>
+<p>Process the whole document only after representative pages succeed. This reduces experimentation time and prevents large volumes of incorrect output.</p>
 
 Set the desired final `config.output.mode` in the generated JSON, then run:
 
@@ -695,7 +695,7 @@ Then re-run the same command.
 <a id="toc-3-stage-responsibilities"></a>
 # 3. What each pipeline stage is responsible for
 
-<p dir="rtl" align="right">يشرح هذا القسم مسؤولية كل مرحلة داخل الـ Pipeline حتى يعرف المطوّر أين يبحث عند ظهور المشكلة: التحليل، المعالجة المسبقة، كشف الجداول، الصفوف، الأعمدة، OCR، إعادة البناء، التحقق، والتصدير.</p>
+<p>This section explains each pipeline stage so developers know where to investigate problems: analysis, preprocessing, table, row and column detection, OCR, reconstruction, validation, and export.</p>
 
 ```text
 PDF
@@ -753,7 +753,7 @@ PDF
 <a id="toc-3-1-crop-only-visual-structure"></a>
 ## 3.1 Shared structure path + detection-only fallback (v3.2.0)
 
-<p dir="rtl" align="right">في أوضاع القص فقط أصبح اكتشاف الـ Rows والـ Cells مرحلة فعلية مستقلة عن OCR. البرنامج لا ينتظر كلمات EasyOCR حتى يبني الشبكة؛ بل يجمع الأدلة الهندسية المناسبة لنوع الصفحة ثم يختار أفضل Structure Candidate بشكل عام بدون أي شرط يعتمد على اسم الملف أو الشركة أو البنك.</p>
+<p>In crop-only modes, row and cell detection are genuinely independent of OCR recognition. The program does not wait for EasyOCR words to construct a grid; it combines geometry evidence appropriate to the page and selects the best structure candidate without conditions tied to a filename, company, or bank.</p>
 
 Crop-only modes:
 
@@ -796,7 +796,7 @@ Character recognition is never initialized in these crop-only modes. The optiona
 
 ### Crop-only vs full: what is shared and what is different?
 
-<p dir="rtl" align="right">الـ Full والـ Crop-only يشتركان في محاولة فهم الـ Structure: الجداول والصفوف والأعمدة والخلايا. الاختلاف الحقيقي أن Crop-only يتوقف بعد حفظ الـ crops ولا يقرأ النص، بينما Full يكمل بمرحلة Recognition ثم Reconstruction وValidation وExcel.</p>
+<p>Full and crop-only modes both infer table structure, including rows, columns, and cells. Crop-only stops after saving crops without reading text; full mode continues to recognition, reconstruction, validation, and Excel export.</p>
 
 | Capability | `cropped_rows_and_cells` | `full` |
 |---|---:|---:|
@@ -836,7 +836,7 @@ page_report.json
 <a id="toc-3-2-strategies"></a>
 ## 3.2 What `digital_text`, `cell_ocr`, `row_ocr`, and the other strategies mean
 
-<p dir="rtl" align="right">الـ <code>Strategy</code> هي <strong>الخطة العامة المقترحة لمعالجة الصفحة</strong> بعد أن يصنّف النظام الصفحة إلى Digital / Scanned / Hybrid ويحدد نوع الـ Layout. هي لا تعني بالضرورة الـ Detector الهندسي الذي اكتشف الخلايا فعلًا؛ هذا دور <code>structure_method</code>.</p>
+<p>A strategy is the high-level page-processing plan proposed after classifying the page as digital, scanned, or hybrid and identifying its layout. It is not necessarily the geometric detector that actually found the cells; structure_method identifies that detector.</p>
 
 The available strategy values in `models.py` are:
 
@@ -867,7 +867,7 @@ structure_method
   Example: bordered_grid, opencv_projection_grid, easyocr_detection_spatial
 ```
 
-<p dir="rtl" align="right">بمعنى أبسط: <code>output.mode</code> يقول "ماذا نريد أن نخرج؟"، والـ <code>Strategy</code> تقول "كيف يُفضّل أن نعالج الصفحة؟"، والـ <code>structure_method</code> تقول "أي طريقة نجحت فعليًا في اكتشاف الـ Structure؟".</p>
+<p>Put simply, output.mode describes what should be produced, the strategy describes the preferred processing approach, and structure_method identifies which method actually succeeded in detecting structure.</p>
 
 ---
 
@@ -897,13 +897,13 @@ digital_text:
   quality_min: 0.72
 ```
 
-<p dir="rtl" align="right">إذن اختيار الـ Strategy ليس عشوائيًا. النظام ينظر أولًا لجودة النص الرقمي، ثم لشكل الصفحة: هل هي Bordered أم Borderless/Mixed أم Free Text.</p>
+<p>Strategy selection is not random. The system first evaluates digital-text quality, then examines whether the layout is bordered, borderless, mixed, or free text.</p>
 
 ---
 
 ### `digital_text`
 
-<p dir="rtl" align="right"><strong>استخدم النص الموجود أصلًا داخل الـ PDF بدل OCR.</strong> هذا مناسب للـ Digital PDF أو Hybrid PDF عندما تكون طبقة النص الأصلية سليمة ويمكن الوثوق بها.</p>
+<p>Use text already embedded in the PDF instead of OCR. This suits digital or hybrid PDFs whose original text layer is valid and trustworthy.</p>
 
 **Think of it as:**
 
@@ -941,13 +941,13 @@ structure_method = native_digital_spatial
 
 If columns are wrong here, tune the **borderless spatial geometry parameters**, not OCR recognition first.
 
-<p dir="rtl" align="right"><strong>مثال:</strong> كشف حساب PDF يمكنك تحديد النص بداخله بالماوس، والكلمات المستخرجة سليمة. هنا الأفضل قراءة النص وإحداثياته مباشرة بدل تحويل الصفحة إلى صورة وقراءة الحروف من جديد.</p>
+<p>For example, if you can select text in a PDF bank statement and the extracted words are correct, it is better to read those words and their coordinates directly than render the page as an image and recognize the characters again.</p>
 
 ---
 
 ### `cell_ocr`
 
-<p dir="rtl" align="right"><strong>الفكرة: اكتشف حدود كل Cell أولًا ثم اقرأ محتوى كل Cell بشكل مستقل.</strong> هذه الاستراتيجية مناسبة خصوصًا للجداول ذات الحدود الواضحة لأن الشبكة تساعد النظام على معرفة مكان كل خلية بدقة.</p>
+<p>The idea is to detect cell boundaries first, then read each cell independently. This especially suits clearly bordered tables because the grid identifies each cell accurately.</p>
 
 **Think of it as:**
 
@@ -1011,13 +1011,13 @@ Correct crop but wrong characters
 → tune OCR second
 ```
 
-<p dir="rtl" align="right"><strong>قاعدة مهمة:</strong> ظهور <code>cell_ocr</code> لا يعني أن OCR هو أول شيء يجب تعديله. لو الخلايا نفسها مقصوصة أو مدموجة أو مقسمة غلط، أصلح <code>bordered_grid</code> أو الـ Structure Method أولًا.</p>
+<p>Important: seeing cell_ocr does not mean OCR should be tuned first. If cells are cropped, merged, or divided incorrectly, fix bordered_grid or the actual structure method before OCR.</p>
 
 ---
 
 ### `row_ocr`
 
-<p dir="rtl" align="right"><strong>الفكرة: اكتشف الـ Row ككتلة واحدة أولًا، ثم اقرأ محتوى الصف واستعمل مواقع الكلمات داخل الصف لتوزيعها على الأعمدة.</strong> هذه الاستراتيجية أنسب للجداول التي لا توجد بينها حدود Cell واضحة، أو للـ Mixed Layout.</p>
+<p>The idea is to detect each row as one block, read its content, and assign words to columns using their positions within that row. This is better suited to tables without clear cell borders and to mixed layouts.</p>
 
 **Think of it as:**
 
@@ -1084,13 +1084,13 @@ split descriptions
 incorrect cell crops
 ```
 
-<p dir="rtl" align="right"><strong>مثال:</strong> كشف حساب لا يحتوي خطوطًا بين الأعمدة. كل Transaction يظهر كسطر، لذلك من المنطقي تحديد السطر أولًا، ثم استخدام أماكن Date / Description / Amount / Balance لتكوين الأعمدة.</p>
+<p>For example, in a statement without vertical column lines, each transaction appears as a row. Detect the row first, then use the positions of Date, Description, Amount, and Balance to form columns.</p>
 
 ---
 
 ### `full_page_ocr`
 
-<p dir="rtl" align="right"><strong>اقرأ الصفحة كاملة كصورة عندما لا توجد Structure موثوقة كفاية لاستخدام Cell أو Row strategy.</strong> هذه هي الخطة الأوسع والأقل اعتمادًا على Geometry منظمة.</p>
+<p>Read the whole page as an image when there is not enough reliable structure for a cell- or row-based strategy. This is the broadest approach and relies least on orderly geometry.</p>
 
 **Think of it as:**
 
@@ -1136,13 +1136,13 @@ It sees more context, but that also means:
 - more reconstruction work,
 - greater chance of assigning text to the wrong logical field.
 
-<p dir="rtl" align="right">لذلك <code>full_page_ocr</code> ليس "أفضل OCR" لمجرد أنه يقرأ الصفحة كاملة. هو اختيار مناسب عندما لا تستطيع تقسيم الصفحة بثقة إلى Cells أو Rows أولًا.</p>
+<p>Therefore, full_page_ocr is not automatically better OCR just because it reads the entire page. It is appropriate when the page cannot reliably be divided into cells or rows first.</p>
 
 ---
 
 ### `digital_with_ocr_fallback`
 
-<p dir="rtl" align="right"><strong>المفهوم:</strong> جرّب النص الرقمي الأصلي أولًا، وإذا كانت جودته غير مقبولة انتقل إلى OCR بدل الاعتماد على Text Layer تالفة أو مشوشة.</p>
+<p>Try the original digital text first. If its quality is unacceptable, fall back to OCR rather than trusting a corrupted or garbled text layer.</p>
 
 **Think of it as:**
 
@@ -1179,13 +1179,13 @@ digital/hybrid + poor quality
 
 So treat `digital_with_ocr_fallback` as a **defined strategy concept / compatibility value**, not something you should expect to see on every bad digital page.
 
-<p dir="rtl" align="right">المهم للمطور هنا هو السلوك، وليس مجرد اسم الـ Enum: لو الـ Digital Text جودته سيئة وFallback مفعّل، لا تثق في طبقة النص المشوشة؛ اسمح للـ Pipeline أن تنتقل إلى مسار OCR مناسب للـ Layout.</p>
+<p>What matters is the actual behavior, not just the enum name: when digital text is poor and fallback is enabled, do not trust the garbled layer; allow the pipeline to switch to an OCR path suited to the layout.</p>
 
 ---
 
 ### `recommended_strategy` vs `executed_strategy`
 
-<p dir="rtl" align="right">من v3.1.0 أصبحنا نفصل بين ما <strong>اقترحه</strong> الـ Classifier وما <strong>تم تنفيذه فعليًا</strong>. هذا مهم جدًا عند الـ Debugging لأن الـ Output Mode أو Fallbacks أو Structure Evidence قد تجعل المسار الفعلي يختلف عن التوصية الأولية.</p>
+<p>Since v3.1.0, the classifier's recommendation and the strategy actually executed are recorded separately. This matters in debugging because output mode, fallbacks, and structure evidence may cause execution to differ from the initial recommendation.</p>
 
 Example:
 
@@ -1239,7 +1239,7 @@ structure_method     = native_digital_spatial
 
 Interpretation:
 
-<p dir="rtl" align="right">استخدم النص الأصلي وإحداثياته. لا تبدأ بتعديل EasyOCR لأن OCR ليس مصدر النص الأساسي هنا.</p>
+<p>Use the original text and its coordinates. Do not begin by adjusting EasyOCR because OCR is not the primary text source here.</p>
 
 ---
 
@@ -1255,7 +1255,7 @@ structure_method     = bordered_grid
 
 Interpretation:
 
-<p dir="rtl" align="right">ابنِ الخلايا من الخطوط أولًا، ثم اقرأ محتوى الخلايا. لو الأعمدة مدموجة أصلح Parameters الـ <code>bordered_table.*</code> قبل OCR.</p>
+<p>Construct cells from detected lines first, then read their contents. If columns merge, fix bordered_table.* parameters before OCR.</p>
 
 ---
 
@@ -1271,7 +1271,7 @@ structure_method     = easyocr_detection_spatial
 
 Interpretation:
 
-<p dir="rtl" align="right">لا توجد Grid موثوقة. CRAFT اكتشف أماكن النص، ثم تم تجميع الـ Boxes إلى Rows/Columns، وبعدها يمكن Recognition قراءة المحتوى في Full mode.</p>
+<p>There is no reliable grid. CRAFT detects text positions, the boxes are grouped into rows and columns, and recognition can then read the contents in full mode.</p>
 
 ---
 
@@ -1287,7 +1287,7 @@ structure_method     = opencv_projection_grid
 
 Interpretation:
 
-<p dir="rtl" align="right">الصفحة فيها إشارات Structure غير كاملة أو خليط بين خطوط ومحتوى بدون حدود كاملة، لذلك التعامل Row-wise أنسب من افتراض Cell Grid كاملة.</p>
+<p>The page has incomplete structure cues or mixes ruling lines with borderless content, so row-wise processing is more suitable than assuming a complete cell grid.</p>
 
 ---
 
@@ -1302,7 +1302,7 @@ recommended_strategy = full_page_ocr
 
 Interpretation:
 
-<p dir="rtl" align="right">لا يوجد Table Structure واضح يمكن الوثوق به، لذلك القراءة على مستوى الصفحة هي الخطة العامة الأنسب.</p>
+<p>No clear and trustworthy table structure exists, so page-level reading is the most appropriate general plan.</p>
 
 ---
 
@@ -1318,7 +1318,7 @@ Interpretation:
 7. Only then choose the parameter family to tune.
 ```
 
-<p dir="rtl" align="right"><strong>لا تعدّل Parameter بسبب كلمة <code>row_ocr</code> أو <code>cell_ocr</code> فقط.</strong> الـ Strategy تخبرك بالخطة العامة، لكن الـ <code>structure_method</code> هو الذي يخبرك أي Detector فعلي يجب ضبط Parameters الخاصة به.</p>
+<p>Do not change a parameter merely because the strategy says row_ocr or cell_ocr. The strategy indicates the plan; structure_method identifies the actual detector whose parameters need tuning.</p>
 
 ### One-line memory aid
 
@@ -1339,14 +1339,14 @@ digital_with_ocr_fallback
 = Trust native text when good; fall back to OCR when it is bad.
 ```
 
-<p dir="rtl" align="right">احفظها بهذه الطريقة: <strong>Digital = النص الأصلي، Cell = خلية خلية، Row = صف صف، Full Page = الصفحة كلها، Digital Fallback = جرّب الرقمي ثم OCR عند الحاجة.</strong></p>
+<p>Remember: Digital means original text; Cell means cell by cell; Row means row by row; Full Page means the entire page; Digital Fallback means try digital text first and use OCR if needed.</p>
 
 ---
 
 <a id="toc-4-error-catalog"></a>
 # 4. Complete error catalog mapped to the current code
 
-<p dir="rtl" align="right">هذا هو كتالوج الأخطاء الرئيسي. كل خطأ مرتبط بأعراضه وسببه في الكود وأول إجراء إصلاحي وحالة الحل: هل يكفي تعديل Config أم يحتاج تطويرًا في الكود.</p>
+<p>This is the main error catalog. Each error specifies symptoms, the cause in code, an initial corrective action, and whether configuration alone suffices or code enhancement is necessary.</p>
 
 This catalog preserves the required column, row, cell, and table-boundary failure classes, but it is organized as **one compact diagnostic card per error** instead of one very wide table. This makes the section readable in VS Code source view as well as Markdown Preview.
 
@@ -1355,7 +1355,7 @@ This catalog preserves the required column, row, cell, and table-boundary failur
 <a id="toc-4-1-error-index"></a>
 ## 4.1 Error catalog index
 
-<p dir="rtl" align="right">فهرس سريع للأخطاء حسب المرحلة. استخدمه للوصول إلى مجموعة الأخطاء الصحيحة: الأعمدة أو الصفوف أو الخلايا أو حدود الجدول.</p>
+<p>A quick stage-based error index. Use it to find the relevant category: column, row, cell, or table-boundary errors.</p>
 
 | Stage | Error IDs | Count | Primary implementation areas |
 |---|---:|---:|---|
@@ -1366,7 +1366,7 @@ This catalog preserves the required column, row, cell, and table-boundary failur
 
 ### Status meaning
 
-<p dir="rtl" align="right">يشرح معنى حقل <code>Status</code> داخل كل خطأ، وهل الحل متاح حاليًا عبر الإعدادات أم مدعوم بالفعل أم يحتاج Code Enhancement.</p>
+<p>This explains each error card's Status field: whether a fix is configurable now, already supported, or requires code enhancement.</p>
 
 | Status | Meaning |
 |---|---|
@@ -1380,11 +1380,11 @@ This catalog preserves the required column, row, cell, and table-boundary failur
 <a id="toc-4-1-1-parameter-tuning-protocol"></a>
 ## 4.1.1 Parameter tuning protocol used by every error card
 
-<p dir="rtl" align="right">هذا الجزء مهم جدًا قبل تغيير أي Parameter. لا تغيّر القيم بالتخمين ولا تغيّر أكثر من Parameter واحد في نفس التجربة. ابدأ من القيمة الفعلية المستخدمة في الـ Run، عدّل خطوة صغيرة في الاتجاه المكتوب تحت الخطأ، أعد تشغيل صفحة واحدة فقط، ثم قرر هل تكمل في نفس الاتجاه أم ترجع.</p>
+<p>Before changing any parameter, avoid guessing or changing several parameters together. Start from the actual value used by the run, make a small adjustment in the specified direction, rerun just one page, and decide whether to continue or revert.</p>
 
 ### The five-step tuning loop
 
-<p dir="rtl" align="right">استخدم هذه الدورة في كل تجربة ضبط: تأكد من القيمة الفعلية، اعرف الـ Detector المستخدم، غيّر قيمة واحدة فقط، أعد تشغيل صفحة واحدة، ثم قارن نفس الـ Debug overlay قبل وبعد.</p>
+<p>Use this loop for every tuning experiment: confirm the effective value, identify the detector used, change one value, rerun one page, and compare the same debug overlay before and after.</p>
 
 1. **Confirm the effective value**, not what you remember editing:
 
@@ -1404,7 +1404,7 @@ Omit `--run-config` on the first run when no JSON exists yet.
 
 ### Safe first-step sizes
 
-<p dir="rtl" align="right">هذه أحجام تغييرات أولية آمنة نسبيًا حتى تستطيع ملاحظة أثر الـ Parameter بدون القفز لقيمة متطرفة. القيم التفصيلية لكل Error موجودة في Recipe الخاصة به.</p>
+<p>These are relatively safe initial adjustment sizes that let you observe effects without jumping to extremes. Each error recipe provides its own detailed values.</p>
 
 These are tuning increments, not hard rules. The error cards below give exact first/second trials for the v3.2 baseline.
 
@@ -1420,7 +1420,7 @@ These are tuning increments, not hard rules. The error cards below give exact fi
 
 ### How to edit a dotted parameter in JSON
 
-<p dir="rtl" align="right">اسم الـ Parameter في الدليل يظهر غالبًا بصيغة Dotted path. داخل ملف JSON لا تكتب النقاط في مفتاح واحد؛ حوّله إلى Objects متداخلة داخل <code>config</code> كما في المثال التالي.</p>
+<p>Parameter names often use dotted paths in this guide. In JSON, do not write the entire path as one key; represent it as nested objects inside config, as shown below.</p>
 
 A dotted path such as:
 
@@ -1447,7 +1447,7 @@ Keep the rest of the generated JSON unchanged.
 <a id="toc-4-1-2-structure-method-map"></a>
 ## 4.1.2 `structure_method` → parameter family map
 
-<p dir="rtl" align="right">قبل أن تغيّر أي قيمة، اقرأ <code>structure_method</code> في الـ Console أو <code>page_report.json</code>. هذا الحقل يخبرك أي Detector أنتج الـ Structure الفائز؛ لذلك يحدد أي مجموعة Parameters تستحق التعديل.</p>
+<p>Before changing a value, read structure_method in the console or page_report.json. It identifies the detector that produced the winning structure and therefore which parameter family to adjust.</p>
 
 | `structure_method` | Tune these first | Primary debug evidence |
 |---|---|---|
@@ -1466,7 +1466,7 @@ If the winning `structure_method` changes after a trial, **stop and reassess**. 
 <a id="toc-4-1-2b-where-to-edit-parameters"></a>
 ## 4.1.2B Where exactly do I edit a parameter?
 
-<p dir="rtl" align="right">أي Parameter مكتوب في الـ README بالشكل النقطي مثل <code>bordered_table.vertical.merge_gap_px</code> هو <strong>مسار داخل ملف الـConfig</strong>، وليس سطرًا ستجده مكتوبًا حرفيًا بنفس الشكل.</p>
+<p>A dotted parameter name in this README, such as bordered_table.vertical.merge_gap_px, represents a path within the configuration, not a literal line written in that exact form.</p>
 
 For example:
 
@@ -1502,7 +1502,7 @@ Use:
 configs/default.yaml
 ```
 
-<p dir="rtl" align="right">عدّل هنا عندما تكون القيمة الجديدة مناسبة كـ Default عام لمعظم ملفات الـ PDF المستقبلية، وليس فقط لملف واحد.</p>
+<p>Make changes here when the new value is a suitable general default for most future PDFs, not merely a single document.</p>
 
 Example:
 
@@ -1534,7 +1534,7 @@ outputs/Account_Statement_scanned.run_config.json
 
 Use this file for PDF-specific tuning.
 
-<p dir="rtl" align="right">لو المشكلة موجودة في PDF معين فقط، لا تغيّر <code>default.yaml</code> بسبب هذا الملف. عدّل الـ JSON الخاص به حتى لا تؤثر على باقي الملفات.</p>
+<p>If a problem affects only one PDF, do not change default.yaml for that document. Adjust its JSON instead to avoid affecting other PDFs.</p>
 
 Inside the generated JSON, edit the parameter under:
 
@@ -1606,7 +1606,7 @@ or inside the generated run-config JSON:
 }
 ```
 
-<p dir="rtl" align="right">بهذا الشكل تظل القيمة العامة مثلًا <code>12</code>، لكن Page 11 فقط تستخدم <code>18</code>.</p>
+<p>In this example, the global value remains 12, while only page 11 uses 18.</p>
 
 ---
 
@@ -1628,7 +1628,7 @@ Need to change a parameter
               page_overrides
 ```
 
-<p dir="rtl" align="right"><strong>قاعدة المشروع:</strong> التعديلات العامة تذهب إلى <code>default.yaml</code>. التعديلات الخاصة بملف واحد تذهب إلى <code>run_config.json</code>. التعديلات الخاصة بصفحة واحدة تذهب إلى <code>page_overrides</code>.</p>
+<p>Project rule: general changes belong in default.yaml; file-specific changes belong in run_config.json; page-specific changes belong in page_overrides.</p>
 
 ---
 
@@ -1686,7 +1686,7 @@ ocr:
 
 ### F. Recommended tuning workflow
 
-<p dir="rtl" align="right">لا تغيّر عدة قيم مرة واحدة. استخدم الخطوات التالية حتى تعرف بالضبط أي Parameter أصلح المشكلة.</p>
+<p>Do not change multiple values at once. Follow these steps to know exactly which parameter fixed the problem.</p>
 
 ```text
 1. Run one representative page with --debug.
@@ -1790,7 +1790,7 @@ structure_method = easyocr_detection_spatial
 
 start with the borderless spatial column parameters instead.
 
-<p dir="rtl" align="right">نفس الخطأ الظاهري قد يكون له Parameter مختلف تمامًا حسب الـ <code>structure_method</code>. لذلك لا تختار الـ Parameter من شكل الخطأ فقط؛ اختاره من الخطأ + الطريقة التي بنت الـ Structure.</p>
+<p>The same apparent error can require entirely different parameters depending on structure_method. Select parameters based on both the symptom and the method used to construct the structure.</p>
 
 ---
 
@@ -1814,14 +1814,14 @@ configs/default.yaml
 
 for active project-wide defaults.
 
-<p dir="rtl" align="right">الـ reference موجود للرجوع إلى إعدادات v3.2.0 الأصلية والمقارنة فقط. أثناء الشغل اليومي عدّل <code>default.yaml</code> أو الـ run-config الخاص بالـ PDF.</p>
+<p>The reference file is only for comparing with and recovering the original v3.2.0 settings. During everyday work, edit default.yaml or that PDF's run config.</p>
 
 ---
 
 <a id="toc-4-1-3-structure-method-explained"></a>
 ## 4.1.3 Simple explanation of each `structure_method` + its parameters
 
-<p dir="rtl" align="right">القيمة <code>structure_method</code> لا تصف نوع الـ PDF نفسه، وإنما تصف <strong>الطريقة التي نجحت فعليًا في بناء الصفوف والأعمدة والخلايا في هذه الصفحة</strong>. لذلك هي أول شيء يجب أن تنظر إليه قبل تعديل أي Parameter. الجداول التالية تربط كل Method بالـ Parameters الفعلية الموجودة في <code>default.yaml</code> في v3.2.0، وتوضح اتجاه التعديل بشكل مبسط.</p>
+<p>structure_method does not describe the PDF type; it describes the method that actually succeeded in constructing the page's rows, columns, and cells. Inspect it before tuning. The following tables map each method to the real v3.2.0 default.yaml parameters and explain adjustment directions.</p>
 
 > **Baseline note:** The values below are the v3.2.0 defaults. `default.yaml` was verified to be semantically identical to `default_v3.2.0.reference.yaml` before the validated baseline run. The fixes documented in Section 15 were code-level generic fixes; the validated E2E was rerun without PDF-specific parameter tuning.
 
@@ -1831,7 +1831,7 @@ for active project-wide defaults.
 
 ### `bordered_grid`
 
-<p dir="rtl" align="right"><strong>جدول له خطوط وحدود واضحة.</strong> النظام رأى خطوطًا أفقية ورأسية تكوّن شبكة جدول، ثم استخدم تقاطعات هذه الخطوط لبناء الصفوف والأعمدة والخلايا.</p>
+<p>A table with clear ruling lines and boundaries. The system detected horizontal and vertical lines forming a grid, then used their intersections to construct rows, columns, and cells.</p>
 
 **Think of it as:** `visible table lines → grid → cells`.
 
@@ -1856,13 +1856,13 @@ for active project-wide defaults.
 | `bordered_table.cells.minimum_height_px` | `10` | Rejects cells shorter than this. | **Lower** for short real rows; **raise** to filter tiny false rows. |
 | `bordered_table.cells.minimum_area_px` | `150` | Rejects cells below this pixel area. | **Lower** if small legitimate cells disappear; **raise** if tiny noise cells survive. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو عندك 7 أعمدة لكن ظهر 6 لأن خطًا رأسيًا مكسور، ابدأ بزيادة <code>bordered_table.vertical.merge_gap_px</code> قليلًا. لو ظهر خط رأسي كاذب من Noise، ارفع <code>vertical.minimum_line_length_ratio</code> بدلًا من تغيير كل إعدادات الأعمدة.</p>
+<p>For example, if seven columns become six because a vertical line is broken, slightly increase bordered_table.vertical.merge_gap_px. If noise creates a false vertical line, increase vertical.minimum_line_length_ratio rather than changing all column settings.</p>
 
 ---
 
 ### `opencv_shaded_grid`
 
-<p dir="rtl" align="right"><strong>الجدول تم اكتشافه من التظليل أو الخلفيات المختلفة للخلايا، وليس اعتمادًا على الخطوط فقط.</strong> هذه الطريقة مناسبة جدًا للجداول التي تحتوي خلايا رمادية/مظللة أو فواصل فاتحة لا يلتقطها Line Detector التقليدي.</p>
+<p>The table was detected from cell shading or different backgrounds, not lines alone. This is particularly useful with gray or shaded cells and light separators missed by conventional line detection.</p>
 
 **Think of it as:** `cell shading/background blocks → aligned grid → cells`.
 
@@ -1922,13 +1922,13 @@ for active project-wide defaults.
 | `table_split_gap_height_factor` | `4.0` | Row-height based split threshold. | **Lower** if separate blocks stay merged; **raise** for very tall/wrapped rows. |
 | `confidence_rows_target` | `4` | Number of rows needed to reach full row-count confidence contribution. | **Lower** for valid very short tables; **raise** if tiny patterns get overconfident. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو الخلايا الرمادية موجودة لكن النظام لا يلتقط الخلايا الصغيرة، قلّل <code>minimum_component_width_px</code> و/أو <code>minimum_component_height_px</code> تدريجيًا. لو Background كامل يتحول إلى Cell ضخمة، ارفع <code>contrast_deltas</code> أو شدّد <code>maximum_component_*_ratio</code>.</p>
+<p>For example, if small gray cells are missed, gradually reduce minimum_component_width_px and/or minimum_component_height_px. If an entire background becomes one huge cell, increase contrast_deltas or tighten maximum_component_*_ratio.</p>
 
 ---
 
 ### `opencv_projection_grid`
 
-<p dir="rtl" align="right"><strong>النظام بنى الجدول من توزيع الحبر/النص بصريًا على الصورة.</strong> لا يحتاج قراءة الكلمات؛ يحول الكتابة إلى Components ويستخدم مواقعها والفجوات والمحاذاة المتكررة لبناء الصفوف والأعمدة.</p>
+<p>The system reconstructed the table from the visual distribution of ink and text in the image. It does not need to recognize words; instead, it groups ink components by position, gaps, and repeated alignment to infer rows and columns.</p>
 
 **Think of it as:** `ink density + whitespace/alignment → rows/columns → cells`.
 
@@ -1976,13 +1976,13 @@ The following parameters behave the same way as in `opencv_shaded_grid`:
 | `outer_padding_px` | `0` | Raise if edge content is cut. |
 | `minimum_column_width_px` | `12` | Lower to keep narrow true columns; raise to remove ghost columns. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو Description طويل اتقسم إلى عدة Columns كاذبة، غالبًا <code>intra_block_merge_gap_px</code> صغير جدًا أو <code>x_alignment_tolerance</code> غير مناسب. لو عمودان حقيقيان اندمجوا، اعكس الاتجاه ولا تستمر في زيادة merge tolerances.</p>
+<p>For example, if a long Description is split into false columns, intra_block_merge_gap_px may be too small or x_alignment_tolerance inappropriate. If two real columns merge, reverse the adjustment rather than continuously increasing merge tolerances.</p>
 
 ---
 
 ### `easyocr_detection_spatial`
 
-<p dir="rtl" align="right"><strong>الطرق البصرية العادية لم تكن كافية، لذلك استخدم النظام EasyOCR/CRAFT لمعرفة أماكن وجود النص فقط.</strong> في Crop-only يتم تحميل الـ Detector فقط مع <code>recognizer=false</code>، ثم تُستخدم Bounding Boxes مكانيًا لبناء الصفوف والأعمدة والخلايا.</p>
+<p>Standard visual methods were insufficient, so EasyOCR/CRAFT was used to locate text without decoding it. In crop-only mode, only the detector is loaded with recognizer=false, and its bounding boxes are grouped spatially to construct rows, columns, and cells.</p>
 
 **Think of it as:** `where text exists → spatial clustering → rows/columns → cells`.
 
@@ -2035,7 +2035,7 @@ CRAFT only says **where text exists**. The boxes are then passed through the sam
 | `maximum_columns` | `12` | Lower to suppress overcounting; raise for genuinely wider tables. |
 | `borderless_table.clustering.min_samples` | `1` | Raise to reject singleton/noisy alignments; keep `1` for sparse documents. |
 
-<p dir="rtl" align="right"><strong>مهم:</strong> في هذا الـ Method لا تبدأ بتغيير <code>borderless_table.column_detection.*</code> إذا كان ملف <code>07c_text_detection_boxes.png</code> نفسه ناقصًا. أصلح CRAFT Detection أولًا، ثم انتقل إلى Row/Column clustering.</p>
+<p>Important: with this method, do not start changing borderless_table.column_detection.* if 07c_text_detection_boxes.png is already missing boxes. Fix CRAFT detection first, then row/column clustering.</p>
 
 ---
 
