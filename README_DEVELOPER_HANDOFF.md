@@ -2890,7 +2890,7 @@ none
 <!-- tuning-recipe:CELL7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان الخطأ محصورًا في نص مدوّر، فعّل زوايا Rotation بدل تغيير DPI/threshold لكل الصفحة.</p>
+<p>If the problem affects only rotated text, enable rotation angles instead of changing DPI or thresholds for the entire page.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2902,7 +2902,7 @@ none
 
 ### CELL8 — Arabic/RTL/diacritics misread
 
-<p dir="rtl" align="right"><strong>أخطاء العربية وRTL والتشكيل أو الخلايا المختلطة:</strong> تظهر كحروف عربية معكوسة/مبعثرة أو أخطاء عند مزج العربية بالأرقام. راجع لغات EasyOCR وترتيب RTL، وقد تحتاج نموذج Recognition مخصص إذا تكرر النمط.</p>
+<p>Arabic, RTL, diacritics, or mixed-language cells may produce reversed or scattered Arabic characters or errors mixing Arabic and numbers. Check EasyOCR languages and RTL ordering; repeated patterns may require a custom recognition model.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2914,7 +2914,7 @@ none
 <!-- tuning-recipe:CELL8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">تأكد أولًا أن العربية والإنجليزية مفعّلتان، ثم جرّب Decoder أقوى قبل الانتقال إلى Custom model. لا تغيّر Geometry إذا الـCrop صحيح.</p>
+<p>First ensure Arabic and English are enabled, then try a stronger decoder before switching to a custom model. Do not change geometry if the crop is correct.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2929,7 +2929,7 @@ none
 
 ### CELL9 — Numeric formatting parsed incorrectly
 
-<p dir="rtl" align="right"><strong>تحليل التنسيق الرقمي بشكل غير صحيح:</strong> تحدث عند التباس الفاصلة العشرية وفاصل الآلاف أو رموز العملة والأرقام العربية. يجب أن تمر القيم الرقمية عبر Normalization واعٍ بنمط الأرقام المتوقع.</p>
+<p>Incorrect numeric parsing occurs when decimal and thousands separators, currency symbols, or Arabic digits are confused. Normalize numeric values according to the expected number format.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2941,7 +2941,7 @@ none
 <!-- tuning-recipe:CELL9 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">هذه مشكلة Parsing/Schema أكثر من كونها Tolerance. لا تحاول إصلاح الفاصلة العشرية بتغيير OCR geometry.</p>
+<p>This is primarily a parsing and schema issue, not a tolerance issue. Do not try to fix decimal separators by changing OCR geometry.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2955,11 +2955,11 @@ none
 <a id="toc-4-5-table-boundary-errors"></a>
 ## 4.5 Table Boundary Detection Errors
 
-<p dir="rtl" align="right">أخطاء حدود الجدول تتعلق بتحديد مكان بداية ونهاية الجدول أو فصل عدة جداول أو استبعاد النصوص والشعارات والعلامات المائية المحيطة بالجدول.</p>
+<p>Table boundary errors concern locating table starts and ends, separating multiple tables, and excluding surrounding text, logos, and watermarks.</p>
 
 ### T1 — Table start/end boundary missed with multiple tables
 
-<p dir="rtl" align="right"><strong>فقد بداية/نهاية الجدول عند وجود عدة جداول:</strong> يحدث عندما تُجمع كتلتان جدوليّتان منفصلتان في Region واحدة، خصوصًا في Borderless. تحتاج الصفحة إلى منطق يفصل الجداول باستخدام الفجوات أو تغيّر البنية.</p>
+<p>Missing starts or ends with multiple tables occur when two distinct table blocks are grouped into one region, especially in borderless layouts. The page needs logic to separate blocks using gaps or structural changes.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2971,7 +2971,7 @@ none
 <!-- tuning-recipe:T1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لفصل جدولين ملتصقين رأسيًا، اجعل شرط الانقسام أقل صرامة: قلّل عوامل/نسب فجوة الفصل تدريجيًا. إذا انقسم جدول واحد بالخطأ اعكس الاتجاه.</p>
+<p>To split vertically adjacent tables, gradually reduce split-gap factors or ratios. If a single table is incorrectly split, reverse the adjustment.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2985,7 +2985,7 @@ none
 
 ### T2 — False positive non-table content
 
-<p dir="rtl" align="right"><strong>اعتبار نص عادي جدولًا:</strong> يحدث عندما تبدو فقرة كثيفة أو قائمة وكأن لها محاذاة أعمدة. يجب رفع شروط الاتساق والتحقق من أن Candidate لديه بنية صفوف وأعمدة حقيقية قبل قبوله.</p>
+<p>Ordinary text can be mistaken for a table when dense paragraphs or lists appear column-aligned. Increase consistency requirements and verify that candidates have real row and column structure.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2997,7 +2997,7 @@ none
 <!-- tuning-recipe:T2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند اعتبار Paragraph جدولًا، ارفع شروط الاتساق بدل محاولة حذف Region يدويًا.</p>
+<p>If a paragraph is detected as a table, strengthen structural consistency criteria rather than manually deleting the region.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3012,7 +3012,7 @@ none
 
 ### T3 — Boundary cut off prematurely
 
-<p dir="rtl" align="right"><strong>حدود الجدول تتوقف قبل نهايته:</strong> تظهر عندما تكون الصفوف السفلية مفقودة لأن Region انتهت عند خط أو فجوة داخلية بدل نهاية الجدول الحقيقية. راجع line detection والـ closing والـ region overlay.</p>
+<p>Premature table boundaries omit bottom rows because a region ends at an internal line or gap. Inspect line detection, closing operations, and the region overlay.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3024,7 +3024,7 @@ none
 <!-- tuning-recipe:T3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا توقفت الحدود قبل آخر صف، أصلح الخطوط المكسورة أو منع الانقسام الداخلي المبكر حسب الـstructure_method.</p>
+<p>If a boundary ends before the final row, repair broken lines or prevent premature internal splits according to structure_method.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3038,7 +3038,7 @@ none
 
 ### T4 — Multi-page table not linked
 
-<p dir="rtl" align="right"><strong>الجدول الممتد على صفحات يظهر كجداول منفصلة:</strong> هو نفس مفهوم الاستمرار بين الصفحات ولكن على مستوى Table Region. يحتاج النظام إلى ربط الصفحات المتتالية عندما تتطابق Geometry ولا يبدأ جدول جديد فعليًا.</p>
+<p>Tables continued across pages appear as separate table regions. The system needs to link consecutive pages with matching geometry when no genuinely new table begins.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3050,7 +3050,7 @@ none
 <!-- tuning-recipe:T4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا توجد قيمة Config تربط Table regions بين الصفحات. استخدم Fix 2 بدل تعديل Gap/Tolerance.</p>
+<p>No configuration value currently connects table regions across pages. Use Fix 2 instead of adjusting gap or tolerance settings.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3062,7 +3062,7 @@ none
 
 ### T5 — Nested table double-counted
 
-<p dir="rtl" align="right"><strong>اكتشاف جدول داخلي مرتين:</strong> يحدث عندما يتم احتساب Sub-table ضمن الجدول الأب ثم كمنطقة مستقلة أيضًا، فتتكرر البيانات. قد يلزم Containment/Deduplication صريح للحالات التي لا يمنعها contour retrieval الحالي.</p>
+<p>Nested tables may be detected twice when a subtable is counted both inside its parent and as an independent region. Explicit containment and deduplication may be necessary beyond existing contour retrieval.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3074,7 +3074,7 @@ none
 <!-- tuning-recipe:T5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا يوجد Containment-dedupe parameter صريح حاليًا. لا تحاول حل التكرار بتغيير minimum area عشوائيًا لأنه قد يحذف جداول حقيقية.</p>
+<p>No explicit containment-deduplication parameter exists. Randomly adjusting minimum area may remove valid tables rather than fixing duplicates.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3086,7 +3086,7 @@ none
 
 ### T6 — Watermark/logo/margin distorts boundary
 
-<p dir="rtl" align="right"><strong>Logo أو Watermark أو الهوامش توسع حدود الجدول:</strong> تدخل عناصر الصفحة غير الجدولية في الكشف فتنتج Region أكبر من الجدول أو Ghost table. ابدأ بالـ preprocessing والفلترة، وقد تحتاج Content ROI ثابتًا لهذه الفئة.</p>
+<p>Logos, watermarks, and margins may enlarge table regions or produce ghost tables. Start with preprocessing and filtering; this document family may require a fixed content ROI.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3098,7 +3098,7 @@ none
 <!-- tuning-recipe:T6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">ابدأ برفع شروط الخط/الاتساق حتى لا تدخل العلامات القصيرة والـLogo في الجدول. إذا كان العنصر كبيرًا ويظل داخل Region فالحل الحقيقي Content ROI.</p>
+<p>First strengthen line and consistency thresholds so short marks and logos are not included. If a large object still expands the region, use a content ROI.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3113,7 +3113,7 @@ none
 
 ### T7 — Inconsistent page template breaks fixed boundary
 
-<p dir="rtl" align="right"><strong>اختلاف Template الصفحات يكسر حدودًا ثابتة:</strong> يحدث عندما تُستخدم Geometry واحدة لصفحات ذات تنسيقات مختلفة. الأفضل الكشف لكل صفحة واستخدام Overrides فقط للصفحات الاستثنائية أو مجموعات Template مؤكدة.</p>
+<p>Different page templates invalidate fixed table boundaries. Detect each page separately, using overrides only for exceptional pages or confirmed template groups.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3125,7 +3125,7 @@ none
 <!-- tuning-recipe:T7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Template مختلف = إعداد مختلف على مستوى الصفحة/المجموعة، وليس قيمة عالمية واحدة. استخدم `page_overrides` ولا تغيّر الـbaseline الذي يعمل على بقية الصفحات.</p>
+<p>Different templates require page- or group-specific settings, not one global setting. Use page_overrides without changing a baseline that works on other pages.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3138,7 +3138,7 @@ none
 
 ### T8 — Blurred scan breaks boundary polygon
 
-<p dir="rtl" align="right"><strong>الـ Scan الباهت أو المشوش يكسر إطار الجدول:</strong> عندما تكون الخطوط متقطعة أو باهتة لا تتكون Polygon مغلقة. يمكن تقوية Morphological closing وتقليل شروط طول الخط بحذر حتى تتصل الحدود بدون خلق خطوط وهمية.</p>
+<p>Faint or noisy scans break table frames when weak or interrupted lines cannot form closed polygons. Carefully strengthen morphological closing and relax minimum line length without introducing false lines.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3150,7 +3150,7 @@ none
 <!-- tuning-recipe:T8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">للـScan الباهت، حسّن الاتصال بين الخطوط تدريجيًا. غيّر Parameter واحدًا كل مرة لأن Denoise/closing/line length يمكن أن تصنع خطوطًا وهمية إذا بالغت فيها.</p>
+<p>For faint scans, improve line connectivity incrementally. Change one parameter at a time because excessive denoising, closing, or line-length relaxation can create false lines.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3169,16 +3169,16 @@ none
 <a id="toc-5-debugging-rules"></a>
 # 5. Stage-by-stage debugging rules
 
-<p dir="rtl" align="right">هذا القسم يحول التشخيص إلى خطوات عملية حسب مرحلة الـ Pipeline. استخدمه بعد تحديد نوع الخطأ لمعرفة الملفات والـ Parameters والـ Debug Artifacts التي يجب مراجعتها.</p>
+<p>This section turns diagnosis into concrete steps for each pipeline stage. Use it after identifying the error to find the relevant files, parameters, and debug artifacts.</p>
 
 <a id="toc-5-1-column-debug"></a>
 ## 5.1 Column detection
 
-<p dir="rtl" align="right">مرجع عملي لتصحيح اكتشاف الأعمدة، مع فصل طريقة التعامل مع الجداول بدون حدود عن الجداول ذات الخطوط والحدود.</p>
+<p>Practical column-detection guidance that distinguishes borderless tables from ruled or bordered tables.</p>
 
 ### Borderless path
 
-<p dir="rtl" align="right">هذا المسار خاص بالجداول التي لا تحتوي على خطوط فاصلة واضحة، ويعتمد أكثر على مواقع النصوص والتجميع والمسافات بين الأعمدة.</p>
+<p>This path applies to tables without clear separator lines, relying primarily on word positions, clustering, and column spacing.</p>
 
 Primary parameters:
 
@@ -3201,7 +3201,7 @@ Key behavior in the current implementation:
 
 ### Bordered path
 
-<p dir="rtl" align="right">هذا المسار خاص بالجداول ذات الخطوط أو الشبكة، ويعتمد على اكتشاف الخطوط والـ contours والمورفولوجي لتحديد الحدود.</p>
+<p>This path applies to ruled or grid tables, using line detection, contours, and morphology to identify boundaries.</p>
 
 Primary parameters:
 
@@ -3218,7 +3218,7 @@ Inspect `05_horizontal_lines.png`, `06_vertical_lines.png`, and `10_detected_cel
 <a id="toc-5-2-row-debug"></a>
 ## 5.2 Row detection
 
-<p dir="rtl" align="right">مرجع ضبط اكتشاف الصفوف، خاصة مشاكل المسافات الرأسية، النص الملتف، الـ anchors، وتفاوت ارتفاع الصفوف.</p>
+<p>Row-detection tuning guidance, particularly vertical spacing, wrapped text, anchors, and variable row heights.</p>
 
 Normal borderless rows use baseline clustering + optional continuation merging.
 
@@ -3234,7 +3234,7 @@ When records have a stable per-row anchor, prefer anchor segmentation rather tha
 <a id="toc-5-3-cell-debug"></a>
 ## 5.3 Cell detection
 
-<p dir="rtl" align="right">مرجع مراجعة الـ cell boxes والـ crops والـ padding والتأكد أن كل خلية تغطي المحتوى المطلوب فقط قبل تشغيل OCR.</p>
+<p>Guidance for inspecting cell boxes, crops, and padding to ensure each cell covers only its intended content before OCR.</p>
 
 - Bordered cells are the Cartesian grid between detected line positions.
 - Borderless cells are row bands × inferred column boundaries.
@@ -3244,7 +3244,7 @@ When records have a stable per-row anchor, prefer anchor segmentation rather tha
 <a id="toc-5-4-table-debug"></a>
 ## 5.4 Table boundaries
 
-<p dir="rtl" align="right">مرجع تشخيص منطقة الجدول نفسها قبل تقسيمها إلى صفوف وأعمدة، خصوصًا عند وجود أكثر من جدول أو عناصر صفحة قريبة منه.</p>
+<p>Guidance for diagnosing the table region before splitting it into rows and columns, especially with multiple tables or nearby page elements.</p>
 
 - Bordered detector can return multiple external table regions on one page.
 - Borderless detector currently creates one table covering all words on the page.
@@ -3255,14 +3255,14 @@ When records have a stable per-row anchor, prefer anchor segmentation rather tha
 <a id="toc-6-fix-library"></a>
 # 6. Fix-it code library — when configuration is not enough
 
-<p dir="rtl" align="right">مكتبة حلول برمجية للحالات التي لا يكفي فيها تغيير Parameters. لا تستخدم هذه التعديلات قبل إثبات أن المشكلة ليست قابلة للحل بالإعدادات الحالية.</p>
+<p>Code-fix library for cases that cannot be solved through parameter changes. Do not apply these changes before confirming that current configuration options are insufficient.</p>
 
 These are source-level fixes for required behaviors that are not currently implemented. Add them only after a config-only approach has been ruled out.
 
 <a id="toc-6-fix-1"></a>
 ## Fix 1 — Separate multiple borderless tables by vertical gaps
 
-<p dir="rtl" align="right">حل برمجي لفصل أكثر من جدول Borderless في الصفحة نفسها باستخدام الفجوات الرأسية الكبيرة بين مجموعات المحتوى.</p>
+<p>Code solution for separating multiple borderless tables on the same page using large vertical gaps between content groups.</p>
 
 **Use when:** two unrelated borderless tables on one page are combined into `table_01`.
 
@@ -3299,7 +3299,7 @@ Then run the existing row/column reconstruction independently per block and assi
 <a id="toc-6-fix-2"></a>
 ## Fix 2 — Link multi-page table continuations
 
-<p dir="rtl" align="right">حل لربط أجزاء الجدول نفسه عند استمراره من صفحة إلى أخرى بدل التعامل مع كل صفحة كجدول مستقل.</p>
+<p>Solution for linking parts of the same table across successive pages instead of processing each page as a separate table.</p>
 
 **Use when:** one logical table spans pages and must remain one dataset/table identity.
 
@@ -3332,7 +3332,7 @@ For a stronger implementation, compare normalized column boundary ratios rather 
 <a id="toc-6-fix-3"></a>
 ## Fix 3 — Filter footer/summary rows without deleting legitimate totals blindly
 
-<p dir="rtl" align="right">حل لتمييز Footer أو Summary rows عن البيانات الفعلية بدون حذف صفوف الإجماليات الصحيحة بشكل عشوائي.</p>
+<p>Solution for distinguishing footer and summary rows from actual data without indiscriminately deleting legitimate total rows.</p>
 
 `DataReconstructor` already sets `row.is_total`. Add an explicit export policy instead of silently treating totals as ordinary records:
 
@@ -3357,7 +3357,7 @@ Do not hardcode "bottom N rows" as footer logic.
 <a id="toc-6-fix-4"></a>
 ## Fix 4 — Distinguish confirmed blank from OCR failure
 
-<p dir="rtl" align="right">حل لإضافة حالة واضحة تفرق بين خلية فارغة فعلًا وبين خلية تحتوي محتوى لكن OCR فشل في قراءته.</p>
+<p>Solution for explicitly distinguishing truly blank cells from nonempty cells whose text OCR failed to recognize.</p>
 
 Add a state to `ExtractedCell`:
 
@@ -3382,7 +3382,7 @@ Use a simple ink-density check on the final cell crop; keep the raw crop as evid
 <a id="toc-6-fix-5"></a>
 ## Fix 5 — Detect merged bordered cells / spans
 
-<p dir="rtl" align="right">حل لدعم الخلايا المدمجة <code>rowspan/colspan</code> في الجداول ذات الحدود بدل فرض شبكة موحدة على كل الخلايا.</p>
+<p>Solution for representing merged rowspan and colspan cells in bordered tables instead of imposing a uniform grid.</p>
 
 **Use when:** a missing internal ruling creates a cell wider/taller than the modal grid.
 
@@ -3406,7 +3406,7 @@ A production version must confirm spans against missing internal line evidence b
 <a id="toc-6-fix-6"></a>
 ## Fix 6 — Per-cell orientation handling
 
-<p dir="rtl" align="right">حل لاكتشاف اتجاه النص داخل كل خلية وتدويرها عند الحاجة قبل OCR، خاصة للعناوين الرأسية أو النصوص المدورة.</p>
+<p>Solution for detecting and correcting each cell's text orientation before OCR, particularly vertical headers and rotated content.</p>
 
 First try the configuration-only EasyOCR option:
 
@@ -3438,7 +3438,7 @@ Accept by confidence **and** semantic validation where possible.
 <a id="toc-6-fix-7"></a>
 ## Fix 7 — Add bordered-table content ROI to ignore page furniture
 
-<p dir="rtl" align="right">حل لتحديد منطقة بحث مخصصة للجدول واستبعاد Header/Footer/Logo والعناصر الثابتة التي قد تشوش اكتشاف الحدود.</p>
+<p>Solution for defining a table-specific search region and excluding headers, footers, logos, and fixed elements that interfere with boundary detection.</p>
 
 Add config:
 
@@ -3452,7 +3452,7 @@ Crop the binary image to ROI before line detection, then add the ROI origin back
 <a id="toc-6-fix-8"></a>
 ## Fix 8 — Explicit header-body mapping when header uses colspan
 
-<p dir="rtl" align="right">حل لربط Header يحتوي على خلايا مدمجة بأعمدة البيانات الفعلية اعتمادًا على المواضع بدل الاعتماد على تساوي عدد الخلايا.</p>
+<p>Solution for mapping merged header cells to actual data columns by position rather than requiring equal cell counts.</p>
 
 Do not infer body column count from header cell count. Detect body columns from data rows, then map header text to body column intervals by overlap:
 
@@ -3469,7 +3469,7 @@ Store header span metadata rather than shifting body cells.
 <a id="toc-6-fix-9"></a>
 ## Fix 9 — Page-template grouping without file-specific profiles
 
-<p dir="rtl" align="right">حل لتجميع الصفحات المتشابهة في Template واحد وإعادة استخدام Geometry بينها بدون إنشاء Profiles مرتبطة باسم بنك أو شركة أو ملف.</p>
+<p>Solution for grouping pages with similar templates and reusing their geometry without creating bank-, company-, or filename-specific profiles.</p>
 
 If pages fall into a small number of layouts, group them by measured signatures rather than PDF name:
 
@@ -3486,7 +3486,7 @@ Tune per layout signature, then store the differences in `page_overrides`. This 
 <a id="toc-7-troubleshooting-flow"></a>
 # 7. End-to-end troubleshooting decision flow
 
-<p dir="rtl" align="right">شجرة قرار كاملة لتحديد نقطة الفشل من البداية للنهاية. اتبعها بالترتيب عندما لا تعرف هل المشكلة من PDF أو Preprocessing أو Geometry أو OCR أو Reconstruction أو Validation.</p>
+<p>Complete troubleshooting decision tree for finding the failure point end to end. Follow it when unsure whether the issue originates in PDF input, preprocessing, geometry, OCR, reconstruction, or validation.</p>
 
 ```text
 START
@@ -3543,7 +3543,7 @@ START
 <a id="toc-8-validation-codes"></a>
 # 8. Validation issue codes and what they mean
 
-<p dir="rtl" align="right">مرجع لأكواد Validation التي قد تظهر بعد الاستخراج، وما الذي يعنيه كل كود وأي مرحلة يجب فحصها لمعالجة السبب الحقيقي.</p>
+<p>Reference for validation issue codes emitted after extraction, their meanings, and the pipeline stages to investigate for their real causes.</p>
 
 Current validator can emit:
 
@@ -3571,12 +3571,12 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-cli"></a>
 # 9. CLI command reference
 
-<p dir="rtl" align="right">مرجع أوامر سطر الأوامر الرئيسية للمشروع. استخدمه لمعرفة وظيفة كل Command ومتى يتم تشغيله أثناء التحليل أو التشخيص أو الاستخراج أو الضبط.</p>
+<p>Reference for the project's primary command-line commands, explaining their purpose and when to use them for analysis, diagnosis, extraction, or tuning.</p>
 
 <a id="toc-9-analyze"></a>
 ## `analyze`
 
-<p dir="rtl" align="right">يحلل خصائص صفحات PDF ونوعها وتخطيطها بدون تنفيذ دورة الاستخراج الكاملة؛ مناسب كبداية لفهم الملف.</p>
+<p>Analyzes PDF page characteristics, page types, and layouts without running the full extraction workflow; use it first to understand the document.</p>
 
 ```text
 --config
@@ -3591,7 +3591,7 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-diagnose"></a>
 ## `diagnose`
 
-<p dir="rtl" align="right">يحوّل نتائج التحليل إلى ملاحظات واقتراحات Parameters مبنية على قياسات الصفحة، لمساعدة المطوّر في اختيار نقطة بداية للضبط.</p>
+<p>Turns analysis findings into measurement-based parameter recommendations to help developers choose an initial tuning approach.</p>
 
 ```text
 --config
@@ -3605,7 +3605,7 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-extract"></a>
 ## `extract`
 
-<p dir="rtl" align="right">ينفّذ دورة الاستخراج الفعلية ويولّد المخرجات المطلوبة مثل Excel والـ crops والـ manifests والـ run config حسب وضع الإخراج.</p>
+<p>Executes the extraction pipeline and creates outputs such as Excel, crops, manifests, and run configuration according to the selected output mode.</p>
 
 ```text
 --config
@@ -3623,7 +3623,7 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-inspect-config"></a>
 ## `inspect-config`
 
-<p dir="rtl" align="right">يعرض قيمة Parameter محدد ومرجعه من <code>parameter_catalog.yaml</code> حتى تعرف معناه قبل تغييره.</p>
+<p>Displays the value of a specified parameter and its reference from parameter_catalog.yaml so you understand its meaning before changing it.</p>
 
 ```text
 --config
@@ -3635,7 +3635,7 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-tune"></a>
 ## `tune`
 
-<p dir="rtl" align="right">يختبر عدة قيم لباراميتر واحد على صفحة محددة ويرتب النتائج باستخدام Score يجمع مؤشرات هيكلية وOCR وValidation.</p>
+<p>Tests several values of one parameter on a selected page and ranks results using a score combining structural, OCR, and validation indicators.</p>
 
 ```text
 --config
@@ -3653,7 +3653,7 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-10-output-modes"></a>
 # 10. Output modes — do not confuse them
 
-<p dir="rtl" align="right">يشرح أوضاع الإخراج المختلفة وما الذي يولده كل Mode. راجع هذا القسم عندما تتوقع Excel أو crops ولا تجدها، قبل اعتبار ذلك خطأ في الاستخراج.</p>
+<p>Explains each output mode and its generated artifacts. Consult this section when expected Excel files or crops are missing before assuming extraction failed.</p>
 
 | Mode | Excel | Cell crops | Row crops | Training labels | Character recognition? | Detection-only text boxes? |
 |---|---:|---:|---:|---:|---:|---:|
@@ -3672,7 +3672,7 @@ Important: crop-only modes first use native/OpenCV geometry. Only when that prod
 <a id="toc-11-parameter-reference"></a>
 # 11. Parameter reference — every key in the current `configs/default.yaml`
 
-<p dir="rtl" align="right">المرجع الشامل لجميع Parameters الموجودة حاليًا في <code>configs/default.yaml</code>: وظيفة كل قيمة، متى تعدلها، وما الأعراض التي تشير إلى أنها تحتاج تغييرًا.</p>
+<p>Comprehensive reference for the parameters currently in configs/default.yaml, describing their purpose, when to modify them, and symptoms indicating adjustment is needed.</p>
 
 This appendix mirrors the current default YAML, including the v3.2 visual-structure and detection-only controls, so parameter names/defaults can be checked directly against the generated run-config JSON. Numeric values are not universally range-validated by the code; the "values" column states the safe/meaningful domain supported by the current implementation.
 
@@ -3999,7 +3999,7 @@ This appendix mirrors the current default YAML, including the v3.2 visual-struct
 <a id="toc-11-runtime-supported"></a>
 ## Runtime-supported keys not present in default YAML
 
-<p dir="rtl" align="right">قيم يستطيع الكود التعامل معها وقت التشغيل لكنها ليست مكتوبة افتراضيًا في <code>default.yaml</code>. استخدمها فقط عندما تكون الحالة المطلوبة واضحة ومذكورة هنا.</p>
+<p>Runtime-supported keys not included by default in default.yaml. Use them only when the required behavior is clear and documented here.</p>
 
 | Parameter | Status | Use |
 |---|---|---|
@@ -4013,7 +4013,7 @@ This appendix mirrors the current default YAML, including the v3.2 visual-struct
 <a id="toc-12-parameter-principles"></a>
 # 12. Parameter-selection principles
 
-<p dir="rtl" align="right">قواعد اختيار وتعديل الـ Parameters بطريقة منهجية: غيّر أقل عدد ممكن من القيم، استخدم القياسات والـ debug، وثبّت القيم الناجحة بدل التخمين.</p>
+<p>Principles for systematic parameter selection and tuning: change as few values as possible, use measurements and debug evidence, and retain validated settings rather than guessing.</p>
 
 1. **Ratios survive DPI changes better than pixel values.** If you raise render DPI from 400 to 500 (+25%), revisit pixel gaps/padding/morphology values; ratio parameters generally do not need the same scaling.
 2. **Tune one parameter at a time.** Otherwise you cannot tell which change fixed or broke the page.
@@ -4031,7 +4031,7 @@ This appendix mirrors the current default YAML, including the v3.2 visual-struct
 <a id="toc-13-release-checklist"></a>
 # 13. Recommended team release checklist
 
-<p dir="rtl" align="right">قائمة تحقق قبل تسليم نسخة جديدة للفريق أو اعتمادها: اختبارات، Smoke tests، توافق الإعدادات، المخرجات، التوثيق، وعدم كسر السلوك العام للمشروع.</p>
+<p>Release checklist for team handoff or approval, covering tests, smoke tests, configuration consistency, outputs, documentation, and preservation of generic project behavior.</p>
 
 Before calling a configuration "done" for a PDF family/template group:
 
@@ -4058,7 +4058,7 @@ Before calling a configuration "done" for a PDF family/template group:
 <a id="toc-14-known-limitations"></a>
 # 14. Known limitations to communicate during handoff
 
-<p dir="rtl" align="right">قائمة القيود المعروفة حاليًا التي يجب إبلاغ أي مطوّر بها حتى لا يضيع وقتًا في البحث عن Parameter غير موجود أو يفترض أن ميزة غير مطبقة تعمل بالفعل.</p>
+<p>Current known limitations that developers should understand, so they do not search for nonexistent parameters or assume unimplemented features already work.</p>
 
 The current pipeline is strong as a generic page-adaptive foundation, but the handoff should not claim features that are not yet present:
 
@@ -4083,7 +4083,7 @@ These are not reasons to abandon the current architecture; they are explicit bou
 <a id="toc-15-validated-baseline"></a>
 # 15. Validated baseline (2026-08-18) and the protocol for every new PDF
 
-<p dir="rtl" align="right">هذا القسم يسجل آخر نقطة مستقرة وصل إليها المشروع فعليًا بعد الاختبارات، ويوضح بالضبط ما تم إصلاحه ولماذا، ثم يحدد طريقة بدء أي PDF جديد بدون كسر الـ baseline أو تحويل النظام إلى Template خاص بملف واحد.</p>
+<p>Records the latest validated stable baseline, explains exactly what was fixed and why, and defines the protocol for starting each new PDF without breaking the baseline or specializing the system for one template.</p>
 
 ## 15.1 What is considered the current baseline?
 
