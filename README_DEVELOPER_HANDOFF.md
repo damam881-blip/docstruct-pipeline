@@ -2,7 +2,6 @@
 
 ## Table of Contents
 
-<p dir="rtl" align="right"><strong>الفهرس:</strong> استخدم الروابط التالية للانتقال مباشرة إلى القسم المطلوب داخل الدليل.</p>
 
 - [0. Source-of-truth and current audit status](#toc-0-source-of-truth)
 - [1. First opening in VS Code — exact onboarding sequence](#toc-1-onboarding)
@@ -69,14 +68,12 @@
 
 ---
 
-<p dir="rtl" align="right">هذا هو الدليل الرئيسي لتسليم وتشغيل ومعالجة أخطاء نظام استخراج بيانات الـ PDF. يبدأ مع المطوّر من فتح المشروع في VS Code وينتهي بالتشغيل الكامل، التشخيص، ضبط الإعدادات، ومعرفة متى يحتاج الأمر إلى تعديل في الكود.</p>
 
 > **Purpose:** This is the developer-facing front door for the workspace. A developer should be able to open the project in VS Code, verify the environment/model setup, process a new PDF, diagnose geometry/OCR failures, tune the correct parameter, and know when a source-code change is required.
 
 <a id="toc-0-source-of-truth"></a>
 ## 0. Source-of-truth and current audit status
 
-<p dir="rtl" align="right">يوضح هذا القسم ما هي الملفات التي اعتُمد عليها كمصدر للحقيقة أثناء مراجعة المشروع، وما هي حالة الاختبارات والملاحظات المؤكدة على النسخة الحالية من الكود.</p>
 
 This guide was built from the current workspace sources: `main.py`, `config.py`, `models.py`, `configs/default.yaml`, all `pipeline/*.py`, `tests/*.py`, `tools/*.py`, and the existing docs.
 
@@ -93,7 +90,6 @@ The current baseline has also completed a real three-page full E2E regression on
 
 ### Important current-source findings
 
-<p dir="rtl" align="right">ملخص لأهم النتائج التي ظهرت من مراجعة الكود الحالي، بما في ذلك السلوك الفعلي للـ Pipeline والخصائص التي تم إصلاحها أو ما زالت تحتاج تطويرًا.</p>
 
 1. **The project is generic by design.** There are no bank/company/file-name profiles in the current source; configuration is resolved generically.
 2. **Actual engine precedence is:** CLI `--override` → `page_overrides` → JSON `--run-config` → base YAML. **However, the standard developer workflow in this guide intentionally does not use `--override`.** For normal work, change global/default values in YAML and PDF-specific values in the generated JSON.
@@ -124,12 +120,10 @@ The current baseline has also completed a real three-page full E2E regression on
 <a id="toc-1-onboarding"></a>
 # 1. First opening in VS Code — exact onboarding sequence
 
-<p dir="rtl" align="right">هذا القسم هو نقطة البداية لأي مطوّر يفتح المشروع لأول مرة. اتبع الخطوات بالترتيب للتأكد من أن مجلد المشروع، Python، البيئة الافتراضية، مكتبات OCR، والنماذج جاهزة قبل تعديل أي Parameter.</p>
 
 <a id="toc-1-1-open-folder"></a>
 ## 1.1 Open the correct folder
 
-<p dir="rtl" align="right">تأكد أن VS Code مفتوح على جذر المشروع بالكامل، وليس على مجلد فرعي مثل <code>pipeline</code> أو <code>docs</code>، لأن الأوامر والمسارات النسبية تعتمد على تشغيلها من جذر المشروع.</p>
 
 Open the project root itself — the folder that contains:
 
@@ -151,7 +145,6 @@ Do **not** open only `pipeline/` or only `docs/` as the VS Code workspace root.
 <a id="toc-1-2-python-interpreter"></a>
 ## 1.2 Verify the VS Code Python interpreter
 
-<p dir="rtl" align="right">تأكد أن VS Code يستخدم Python الموجود داخل <code>.venv</code> الخاصة بالمشروع؛ استخدام Python آخر قد يؤدي إلى اختلاف المكتبات أو ظهور أخطاء Import غير حقيقية.</p>
 
 The uploaded `.vscode/settings.json` only declares the venv environment manager; it does not pin an absolute interpreter path. In VS Code:
 
@@ -173,7 +166,6 @@ Expected: `sys.executable` points inside this workspace's `.venv`.
 <a id="toc-1-3-venv"></a>
 ## 1.3 Preflight the existing `.venv`
 
-<p dir="rtl" align="right">افحص البيئة الافتراضية الموجودة أولًا بدل إنشائها من جديد. الهدف هو التأكد من سلامة Python والمكتبات المثبتة وعدم وجود تعارضات في Dependencies.</p>
 
 Because `.venv` is intentionally not committed/uploaded, verify it before installing anything:
 
@@ -207,7 +199,6 @@ Only install training helper dependencies when you actually need the training-da
 <a id="toc-1-4-easyocr-models"></a>
 ## 1.4 Preflight the EasyOCR model directories
 
-<p dir="rtl" align="right">تحقق من وجود مجلدات وملفات نماذج EasyOCR القياسية أو المخصصة في المسارات المتوقعة قبل تشغيل OCR، حتى لا تفسر مشكلة Model على أنها مشكلة في الـ Pipeline.</p>
 
 The current default config expects:
 
@@ -248,7 +239,6 @@ Do not assume a model is healthy merely because the directory exists; the first 
 <a id="toc-1-5-tests"></a>
 ## 1.5 Run the unit test suite before touching parameters
 
-<p dir="rtl" align="right">شغّل الاختبارات قبل أي تعديل حتى تعرف هل المشروع سليم أساسًا. إذا فشلت الاختبارات قبل التعديل، عالج المشكلة أولًا ولا تبدأ Tuning على PDF جديد.</p>
 
 ```powershell
 python -m pytest -q
@@ -259,7 +249,6 @@ Treat new failures here as code/environment problems, not PDF tuning problems.
 <a id="toc-1-6-no-ocr-smoke"></a>
 ## 1.6 Run a no-OCR analysis smoke test
 
-<p dir="rtl" align="right">نفّذ تحليلًا سريعًا لا يعتمد على OCR للتأكد من أن قراءة PDF والتحليل الأساسي يعملان قبل إدخال طبقة التعرف الضوئي على النصوص.</p>
 
 ```powershell
 python .\main.py analyze `
@@ -273,7 +262,6 @@ This verifies PyMuPDF/OpenCV analysis without requiring a full OCR extraction.
 <a id="toc-1-7-ocr-smoke"></a>
 ## 1.7 Run an OCR smoke test on one representative page
 
-<p dir="rtl" align="right">اختبر OCR على صفحة واحدة ممثلة للملف بدل تشغيل المستند كله. هذه الخطوة تكشف مشاكل النموذج، GPU/CPU، اللغة، أو الإعدادات بأقل وقت ممكن.</p>
 
 Before this OCR smoke test, set the desired mode in `configs/default.yaml`. For a full OCR smoke test use:
 
@@ -303,18 +291,15 @@ If this fails while analysis succeeded, inspect the OCR/model section of this gu
 <a id="toc-2-new-pdf-workflow"></a>
 # 2. The normal workflow for every new PDF
 
-<p dir="rtl" align="right">هذه هي دورة العمل القياسية التي يجب اتباعها مع كل PDF جديد: تحليل → تشخيص → اختبار صفحة → مراجعة Geometry → تعديل Parameter واحد → حفظ الإعدادات → ثم التوسع لباقي الصفحات.</p>
 
 Use this exact loop instead of editing Python code immediately.
 
 <a id="toc-2-config-inputs"></a>
 ## 2.1 Config files: active YAML, reference YAML, backup, and generated JSON
 
-<p dir="rtl" align="right">من المهم الفصل بين ملف الـ PDF وملفات الإعدادات. الخيار <code>--input</code> يستقبل ملف PDF فقط. ملف YAML الأساسي يدخل من <code>--config</code>، وملف JSON الناتج من تشغيل سابق يدخل من <code>--run-config</code>. لا يتم تمرير YAML أو JSON داخل <code>--input</code>.</p>
 
 ### Which YAML file do I edit?
 
-<p dir="rtl" align="right">في العمل اليومي يوجد ملف YAML واحد فقط تعتبره Active وهو <code>configs/default.yaml</code>. ملف <code>default_v3.2.0.reference.yaml</code> مرجع احتياطي لإعدادات v3.2 الأصلية ولا يدخل في التشغيل إلا إذا مررته أنت صراحةً إلى <code>--config</code>. ملف <code>default.yaml.pre_v3_2_0.bak</code> هو نسخة احتياطية قبل الترقية فقط.</p>
 
 | Workspace file | Role | Edit during normal work? | Used automatically? |
 |---|---|---:|---:|
@@ -333,7 +318,6 @@ Use this exact loop instead of editing Python code immediately.
 
 ### First run — YAML is the configuration source
 
-<p dir="rtl" align="right">في أول تشغيل استخدم ملف <code>configs/default.yaml</code> كإعداد أساسي، وحدد الـ PDF في <code>--input</code>. بعد نجاح التشغيل سيُنشئ النظام ملف <code>*.run_config.json</code> تلقائيًا ما لم تستخدم <code>--no-save-run-config</code>.</p>
 
 ```powershell
 python .\main.py extract `
@@ -359,7 +343,6 @@ document.pdf          ──> --input
 
 ### Later runs — JSON becomes the PDF-specific working configuration
 
-<p dir="rtl" align="right">بعد إنشاء ملف الـ JSON، عدّل القيم داخل الكائن <code>config</code> في هذا الملف. في التشغيل التالي مرّر نفس الـ YAML كـ Base عن طريق <code>--config</code>، ومرّر الـ JSON المعدّل عن طريق <code>--run-config</code>. يظل <code>--input</code> مخصصًا للـ PDF فقط.</p>
 
 ```powershell
 python .\main.py extract `
@@ -396,7 +379,6 @@ For `output.mode` specifically:
 
 ### Verify the effective mode before a real extraction
 
-<p dir="rtl" align="right">قبل أي تشغيل مهم تأكد من الـ Mode الذي سيستخدمه البرنامج فعليًا. لا تعتمد على اسم ملف الـ Output أو على ما تتذكر أنك عدّلته. إذا كنت تستخدم YAML فقط افحصه مباشرة، وإذا كنت تستخدم JSON مرّره أيضًا إلى <code>inspect-config</code>.</p>
 
 YAML only:
 
@@ -484,7 +466,6 @@ in a full run means recognized/native word positions participated in borderless 
 <a id="toc-2-step-a"></a>
 ## Step A — Analyze representative pages
 
-<p dir="rtl" align="right">ابدأ بتحليل صفحات ممثلة لأنواع التخطيط الموجودة في الملف لفهم هل الصفحات Digital أو Scanned وما نوع الجداول قبل بدء الاستخراج الفعلي.</p>
 
 For a short PDF, analyze all pages. For a large PDF, start with page 1, a middle page, and the last page.
 
@@ -500,7 +481,6 @@ Do not use `--fast` when you need line/layout evidence; `--fast` intentionally s
 <a id="toc-2-step-b"></a>
 ## Step B — Ask the built-in advisor for measurement-based suggestions
 
-<p dir="rtl" align="right">استخدم أمر <code>diagnose</code> للحصول على اقتراحات مبنية على القياسات الفعلية للصفحة بدل اختيار Parameters بالتخمين.</p>
 
 ```powershell
 python .\main.py diagnose `
@@ -514,7 +494,6 @@ Treat advisor output as suggestions only. `digital_text.fallback_to_ocr_when_gar
 <a id="toc-2-step-c"></a>
 ## Step C — Extract one representative page with debug artifacts
 
-<p dir="rtl" align="right">نفّذ استخراجًا لصفحة واحدة مع Debug Artifacts حتى تستطيع رؤية الحدود والصفوف والأعمدة والـ crops التي اعتمد عليها النظام.</p>
 
 Before running, choose `output.mode` in `configs/default.yaml` for this first run. Then:
 
@@ -545,7 +524,6 @@ This also creates an editable `*.run_config.json` unless `--no-save-run-config` 
 <a id="toc-2-step-d"></a>
 ## Step D — Inspect geometry before OCR text
 
-<p dir="rtl" align="right">راجع هندسة الجدول أولًا قبل الحكم على OCR. إذا كان Crop أو حدود الصفوف/الأعمدة خاطئًا، فلن يستطيع أفضل OCR إصلاح البيانات الناتجة.</p>
 
 Inspect in this order:
 
@@ -573,7 +551,6 @@ page_report.json
 <a id="toc-2-step-e"></a>
 ## Step E — Edit one parameter in the generated JSON
 
-<p dir="rtl" align="right">بعد أول تشغيل، استخدم ملف <code>*.run_config.json</code> كملف العمل الخاص بهذا الـ PDF. عدّل Parameter واحدًا فقط في كل تجربة حتى تعرف بالضبط أي تغيير أدى إلى التحسن أو التدهور.</p>
 
 Open:
 
@@ -622,7 +599,6 @@ Do not change several unrelated parameters in one trial.
 <a id="toc-2-step-f"></a>
 ## Step F — Re-run using YAML + JSON
 
-<p dir="rtl" align="right">في التشغيل التالي استخدم <code>--config</code> لملف YAML الأساسي و<code>--run-config</code> لملف JSON المعدّل. ملف الـ PDF نفسه يظل دائمًا في <code>--input</code>.</p>
 
 ```powershell
 python .\main.py extract `
@@ -648,7 +624,6 @@ The engine still supports CLI `--override` as a highest-priority compatibility/a
 <a id="toc-2-step-g"></a>
 ## Step G — Use `tune` for a single numeric parameter when useful
 
-<p dir="rtl" align="right">استخدم أمر <code>tune</code> لمقارنة عدة قيم لباراميتر رقمي واحد بطريقة قابلة للقياس عندما لا يكون الاختيار البصري وحده كافيًا.</p>
 
 ```powershell
 python .\main.py tune `
@@ -664,7 +639,6 @@ Never accept the top score blindly; visually inspect the winning geometry.
 <a id="toc-2-step-h"></a>
 ## Step H — Scale to the whole PDF only after representative pages are correct
 
-<p dir="rtl" align="right">لا تشغّل كل صفحات الملف إلا بعد التأكد من نجاح الصفحات الممثلة. هذا يقلل وقت التجربة ويمنع إنتاج كمية كبيرة من نتائج خاطئة.</p>
 
 Set the desired final `config.output.mode` in the generated JSON, then run:
 
@@ -695,7 +669,6 @@ Then re-run the same command.
 <a id="toc-3-stage-responsibilities"></a>
 # 3. What each pipeline stage is responsible for
 
-<p dir="rtl" align="right">يشرح هذا القسم مسؤولية كل مرحلة داخل الـ Pipeline حتى يعرف المطوّر أين يبحث عند ظهور المشكلة: التحليل، المعالجة المسبقة، كشف الجداول، الصفوف، الأعمدة، OCR، إعادة البناء، التحقق، والتصدير.</p>
 
 ```text
 PDF
@@ -753,7 +726,6 @@ PDF
 <a id="toc-3-1-crop-only-visual-structure"></a>
 ## 3.1 Shared structure path + detection-only fallback (v3.2.0)
 
-<p dir="rtl" align="right">في أوضاع القص فقط أصبح اكتشاف الـ Rows والـ Cells مرحلة فعلية مستقلة عن OCR. البرنامج لا ينتظر كلمات EasyOCR حتى يبني الشبكة؛ بل يجمع الأدلة الهندسية المناسبة لنوع الصفحة ثم يختار أفضل Structure Candidate بشكل عام بدون أي شرط يعتمد على اسم الملف أو الشركة أو البنك.</p>
 
 Crop-only modes:
 
@@ -796,7 +768,6 @@ Character recognition is never initialized in these crop-only modes. The optiona
 
 ### Crop-only vs full: what is shared and what is different?
 
-<p dir="rtl" align="right">الـ Full والـ Crop-only يشتركان في محاولة فهم الـ Structure: الجداول والصفوف والأعمدة والخلايا. الاختلاف الحقيقي أن Crop-only يتوقف بعد حفظ الـ crops ولا يقرأ النص، بينما Full يكمل بمرحلة Recognition ثم Reconstruction وValidation وExcel.</p>
 
 | Capability | `cropped_rows_and_cells` | `full` |
 |---|---:|---:|
@@ -836,7 +807,6 @@ page_report.json
 <a id="toc-3-2-strategies"></a>
 ## 3.2 What `digital_text`, `cell_ocr`, `row_ocr`, and the other strategies mean
 
-<p dir="rtl" align="right">الـ <code>Strategy</code> هي <strong>الخطة العامة المقترحة لمعالجة الصفحة</strong> بعد أن يصنّف النظام الصفحة إلى Digital / Scanned / Hybrid ويحدد نوع الـ Layout. هي لا تعني بالضرورة الـ Detector الهندسي الذي اكتشف الخلايا فعلًا؛ هذا دور <code>structure_method</code>.</p>
 
 The available strategy values in `models.py` are:
 
@@ -867,7 +837,6 @@ structure_method
   Example: bordered_grid, opencv_projection_grid, easyocr_detection_spatial
 ```
 
-<p dir="rtl" align="right">بمعنى أبسط: <code>output.mode</code> يقول "ماذا نريد أن نخرج؟"، والـ <code>Strategy</code> تقول "كيف يُفضّل أن نعالج الصفحة؟"، والـ <code>structure_method</code> تقول "أي طريقة نجحت فعليًا في اكتشاف الـ Structure؟".</p>
 
 ---
 
@@ -897,13 +866,11 @@ digital_text:
   quality_min: 0.72
 ```
 
-<p dir="rtl" align="right">إذن اختيار الـ Strategy ليس عشوائيًا. النظام ينظر أولًا لجودة النص الرقمي، ثم لشكل الصفحة: هل هي Bordered أم Borderless/Mixed أم Free Text.</p>
 
 ---
 
 ### `digital_text`
 
-<p dir="rtl" align="right"><strong>استخدم النص الموجود أصلًا داخل الـ PDF بدل OCR.</strong> هذا مناسب للـ Digital PDF أو Hybrid PDF عندما تكون طبقة النص الأصلية سليمة ويمكن الوثوق بها.</p>
 
 **Think of it as:**
 
@@ -941,13 +908,11 @@ structure_method = native_digital_spatial
 
 If columns are wrong here, tune the **borderless spatial geometry parameters**, not OCR recognition first.
 
-<p dir="rtl" align="right"><strong>مثال:</strong> كشف حساب PDF يمكنك تحديد النص بداخله بالماوس، والكلمات المستخرجة سليمة. هنا الأفضل قراءة النص وإحداثياته مباشرة بدل تحويل الصفحة إلى صورة وقراءة الحروف من جديد.</p>
 
 ---
 
 ### `cell_ocr`
 
-<p dir="rtl" align="right"><strong>الفكرة: اكتشف حدود كل Cell أولًا ثم اقرأ محتوى كل Cell بشكل مستقل.</strong> هذه الاستراتيجية مناسبة خصوصًا للجداول ذات الحدود الواضحة لأن الشبكة تساعد النظام على معرفة مكان كل خلية بدقة.</p>
 
 **Think of it as:**
 
@@ -1011,13 +976,11 @@ Correct crop but wrong characters
 → tune OCR second
 ```
 
-<p dir="rtl" align="right"><strong>قاعدة مهمة:</strong> ظهور <code>cell_ocr</code> لا يعني أن OCR هو أول شيء يجب تعديله. لو الخلايا نفسها مقصوصة أو مدموجة أو مقسمة غلط، أصلح <code>bordered_grid</code> أو الـ Structure Method أولًا.</p>
 
 ---
 
 ### `row_ocr`
 
-<p dir="rtl" align="right"><strong>الفكرة: اكتشف الـ Row ككتلة واحدة أولًا، ثم اقرأ محتوى الصف واستعمل مواقع الكلمات داخل الصف لتوزيعها على الأعمدة.</strong> هذه الاستراتيجية أنسب للجداول التي لا توجد بينها حدود Cell واضحة، أو للـ Mixed Layout.</p>
 
 **Think of it as:**
 
@@ -1084,13 +1047,11 @@ split descriptions
 incorrect cell crops
 ```
 
-<p dir="rtl" align="right"><strong>مثال:</strong> كشف حساب لا يحتوي خطوطًا بين الأعمدة. كل Transaction يظهر كسطر، لذلك من المنطقي تحديد السطر أولًا، ثم استخدام أماكن Date / Description / Amount / Balance لتكوين الأعمدة.</p>
 
 ---
 
 ### `full_page_ocr`
 
-<p dir="rtl" align="right"><strong>اقرأ الصفحة كاملة كصورة عندما لا توجد Structure موثوقة كفاية لاستخدام Cell أو Row strategy.</strong> هذه هي الخطة الأوسع والأقل اعتمادًا على Geometry منظمة.</p>
 
 **Think of it as:**
 
@@ -1136,13 +1097,11 @@ It sees more context, but that also means:
 - more reconstruction work,
 - greater chance of assigning text to the wrong logical field.
 
-<p dir="rtl" align="right">لذلك <code>full_page_ocr</code> ليس "أفضل OCR" لمجرد أنه يقرأ الصفحة كاملة. هو اختيار مناسب عندما لا تستطيع تقسيم الصفحة بثقة إلى Cells أو Rows أولًا.</p>
 
 ---
 
 ### `digital_with_ocr_fallback`
 
-<p dir="rtl" align="right"><strong>المفهوم:</strong> جرّب النص الرقمي الأصلي أولًا، وإذا كانت جودته غير مقبولة انتقل إلى OCR بدل الاعتماد على Text Layer تالفة أو مشوشة.</p>
 
 **Think of it as:**
 
@@ -1179,13 +1138,11 @@ digital/hybrid + poor quality
 
 So treat `digital_with_ocr_fallback` as a **defined strategy concept / compatibility value**, not something you should expect to see on every bad digital page.
 
-<p dir="rtl" align="right">المهم للمطور هنا هو السلوك، وليس مجرد اسم الـ Enum: لو الـ Digital Text جودته سيئة وFallback مفعّل، لا تثق في طبقة النص المشوشة؛ اسمح للـ Pipeline أن تنتقل إلى مسار OCR مناسب للـ Layout.</p>
 
 ---
 
 ### `recommended_strategy` vs `executed_strategy`
 
-<p dir="rtl" align="right">من v3.1.0 أصبحنا نفصل بين ما <strong>اقترحه</strong> الـ Classifier وما <strong>تم تنفيذه فعليًا</strong>. هذا مهم جدًا عند الـ Debugging لأن الـ Output Mode أو Fallbacks أو Structure Evidence قد تجعل المسار الفعلي يختلف عن التوصية الأولية.</p>
 
 Example:
 
@@ -1239,7 +1196,6 @@ structure_method     = native_digital_spatial
 
 Interpretation:
 
-<p dir="rtl" align="right">استخدم النص الأصلي وإحداثياته. لا تبدأ بتعديل EasyOCR لأن OCR ليس مصدر النص الأساسي هنا.</p>
 
 ---
 
@@ -1255,7 +1211,6 @@ structure_method     = bordered_grid
 
 Interpretation:
 
-<p dir="rtl" align="right">ابنِ الخلايا من الخطوط أولًا، ثم اقرأ محتوى الخلايا. لو الأعمدة مدموجة أصلح Parameters الـ <code>bordered_table.*</code> قبل OCR.</p>
 
 ---
 
@@ -1271,7 +1226,6 @@ structure_method     = easyocr_detection_spatial
 
 Interpretation:
 
-<p dir="rtl" align="right">لا توجد Grid موثوقة. CRAFT اكتشف أماكن النص، ثم تم تجميع الـ Boxes إلى Rows/Columns، وبعدها يمكن Recognition قراءة المحتوى في Full mode.</p>
 
 ---
 
@@ -1287,7 +1241,6 @@ structure_method     = opencv_projection_grid
 
 Interpretation:
 
-<p dir="rtl" align="right">الصفحة فيها إشارات Structure غير كاملة أو خليط بين خطوط ومحتوى بدون حدود كاملة، لذلك التعامل Row-wise أنسب من افتراض Cell Grid كاملة.</p>
 
 ---
 
@@ -1302,7 +1255,6 @@ recommended_strategy = full_page_ocr
 
 Interpretation:
 
-<p dir="rtl" align="right">لا يوجد Table Structure واضح يمكن الوثوق به، لذلك القراءة على مستوى الصفحة هي الخطة العامة الأنسب.</p>
 
 ---
 
@@ -1318,7 +1270,6 @@ Interpretation:
 7. Only then choose the parameter family to tune.
 ```
 
-<p dir="rtl" align="right"><strong>لا تعدّل Parameter بسبب كلمة <code>row_ocr</code> أو <code>cell_ocr</code> فقط.</strong> الـ Strategy تخبرك بالخطة العامة، لكن الـ <code>structure_method</code> هو الذي يخبرك أي Detector فعلي يجب ضبط Parameters الخاصة به.</p>
 
 ### One-line memory aid
 
@@ -1339,14 +1290,12 @@ digital_with_ocr_fallback
 = Trust native text when good; fall back to OCR when it is bad.
 ```
 
-<p dir="rtl" align="right">احفظها بهذه الطريقة: <strong>Digital = النص الأصلي، Cell = خلية خلية، Row = صف صف، Full Page = الصفحة كلها، Digital Fallback = جرّب الرقمي ثم OCR عند الحاجة.</strong></p>
 
 ---
 
 <a id="toc-4-error-catalog"></a>
 # 4. Complete error catalog mapped to the current code
 
-<p dir="rtl" align="right">هذا هو كتالوج الأخطاء الرئيسي. كل خطأ مرتبط بأعراضه وسببه في الكود وأول إجراء إصلاحي وحالة الحل: هل يكفي تعديل Config أم يحتاج تطويرًا في الكود.</p>
 
 This catalog preserves the required column, row, cell, and table-boundary failure classes, but it is organized as **one compact diagnostic card per error** instead of one very wide table. This makes the section readable in VS Code source view as well as Markdown Preview.
 
@@ -1355,7 +1304,6 @@ This catalog preserves the required column, row, cell, and table-boundary failur
 <a id="toc-4-1-error-index"></a>
 ## 4.1 Error catalog index
 
-<p dir="rtl" align="right">فهرس سريع للأخطاء حسب المرحلة. استخدمه للوصول إلى مجموعة الأخطاء الصحيحة: الأعمدة أو الصفوف أو الخلايا أو حدود الجدول.</p>
 
 | Stage | Error IDs | Count | Primary implementation areas |
 |---|---:|---:|---|
@@ -1366,7 +1314,6 @@ This catalog preserves the required column, row, cell, and table-boundary failur
 
 ### Status meaning
 
-<p dir="rtl" align="right">يشرح معنى حقل <code>Status</code> داخل كل خطأ، وهل الحل متاح حاليًا عبر الإعدادات أم مدعوم بالفعل أم يحتاج Code Enhancement.</p>
 
 | Status | Meaning |
 |---|---|
@@ -1380,11 +1327,9 @@ This catalog preserves the required column, row, cell, and table-boundary failur
 <a id="toc-4-1-1-parameter-tuning-protocol"></a>
 ## 4.1.1 Parameter tuning protocol used by every error card
 
-<p dir="rtl" align="right">هذا الجزء مهم جدًا قبل تغيير أي Parameter. لا تغيّر القيم بالتخمين ولا تغيّر أكثر من Parameter واحد في نفس التجربة. ابدأ من القيمة الفعلية المستخدمة في الـ Run، عدّل خطوة صغيرة في الاتجاه المكتوب تحت الخطأ، أعد تشغيل صفحة واحدة فقط، ثم قرر هل تكمل في نفس الاتجاه أم ترجع.</p>
 
 ### The five-step tuning loop
 
-<p dir="rtl" align="right">استخدم هذه الدورة في كل تجربة ضبط: تأكد من القيمة الفعلية، اعرف الـ Detector المستخدم، غيّر قيمة واحدة فقط، أعد تشغيل صفحة واحدة، ثم قارن نفس الـ Debug overlay قبل وبعد.</p>
 
 1. **Confirm the effective value**, not what you remember editing:
 
@@ -1404,7 +1349,6 @@ Omit `--run-config` on the first run when no JSON exists yet.
 
 ### Safe first-step sizes
 
-<p dir="rtl" align="right">هذه أحجام تغييرات أولية آمنة نسبيًا حتى تستطيع ملاحظة أثر الـ Parameter بدون القفز لقيمة متطرفة. القيم التفصيلية لكل Error موجودة في Recipe الخاصة به.</p>
 
 These are tuning increments, not hard rules. The error cards below give exact first/second trials for the v3.2 baseline.
 
@@ -1420,7 +1364,6 @@ These are tuning increments, not hard rules. The error cards below give exact fi
 
 ### How to edit a dotted parameter in JSON
 
-<p dir="rtl" align="right">اسم الـ Parameter في الدليل يظهر غالبًا بصيغة Dotted path. داخل ملف JSON لا تكتب النقاط في مفتاح واحد؛ حوّله إلى Objects متداخلة داخل <code>config</code> كما في المثال التالي.</p>
 
 A dotted path such as:
 
@@ -1447,7 +1390,6 @@ Keep the rest of the generated JSON unchanged.
 <a id="toc-4-1-2-structure-method-map"></a>
 ## 4.1.2 `structure_method` → parameter family map
 
-<p dir="rtl" align="right">قبل أن تغيّر أي قيمة، اقرأ <code>structure_method</code> في الـ Console أو <code>page_report.json</code>. هذا الحقل يخبرك أي Detector أنتج الـ Structure الفائز؛ لذلك يحدد أي مجموعة Parameters تستحق التعديل.</p>
 
 | `structure_method` | Tune these first | Primary debug evidence |
 |---|---|---|
@@ -1466,7 +1408,6 @@ If the winning `structure_method` changes after a trial, **stop and reassess**. 
 <a id="toc-4-1-2b-where-to-edit-parameters"></a>
 ## 4.1.2B Where exactly do I edit a parameter?
 
-<p dir="rtl" align="right">أي Parameter مكتوب في الـ README بالشكل النقطي مثل <code>bordered_table.vertical.merge_gap_px</code> هو <strong>مسار داخل ملف الـConfig</strong>، وليس سطرًا ستجده مكتوبًا حرفيًا بنفس الشكل.</p>
 
 For example:
 
@@ -1502,7 +1443,6 @@ Use:
 configs/default.yaml
 ```
 
-<p dir="rtl" align="right">عدّل هنا عندما تكون القيمة الجديدة مناسبة كـ Default عام لمعظم ملفات الـ PDF المستقبلية، وليس فقط لملف واحد.</p>
 
 Example:
 
@@ -1534,7 +1474,6 @@ outputs/Account_Statement_scanned.run_config.json
 
 Use this file for PDF-specific tuning.
 
-<p dir="rtl" align="right">لو المشكلة موجودة في PDF معين فقط، لا تغيّر <code>default.yaml</code> بسبب هذا الملف. عدّل الـ JSON الخاص به حتى لا تؤثر على باقي الملفات.</p>
 
 Inside the generated JSON, edit the parameter under:
 
@@ -1606,7 +1545,6 @@ or inside the generated run-config JSON:
 }
 ```
 
-<p dir="rtl" align="right">بهذا الشكل تظل القيمة العامة مثلًا <code>12</code>، لكن Page 11 فقط تستخدم <code>18</code>.</p>
 
 ---
 
@@ -1628,7 +1566,6 @@ Need to change a parameter
               page_overrides
 ```
 
-<p dir="rtl" align="right"><strong>قاعدة المشروع:</strong> التعديلات العامة تذهب إلى <code>default.yaml</code>. التعديلات الخاصة بملف واحد تذهب إلى <code>run_config.json</code>. التعديلات الخاصة بصفحة واحدة تذهب إلى <code>page_overrides</code>.</p>
 
 ---
 
@@ -1686,7 +1623,6 @@ ocr:
 
 ### F. Recommended tuning workflow
 
-<p dir="rtl" align="right">لا تغيّر عدة قيم مرة واحدة. استخدم الخطوات التالية حتى تعرف بالضبط أي Parameter أصلح المشكلة.</p>
 
 ```text
 1. Run one representative page with --debug.
@@ -1790,7 +1726,6 @@ structure_method = easyocr_detection_spatial
 
 start with the borderless spatial column parameters instead.
 
-<p dir="rtl" align="right">نفس الخطأ الظاهري قد يكون له Parameter مختلف تمامًا حسب الـ <code>structure_method</code>. لذلك لا تختار الـ Parameter من شكل الخطأ فقط؛ اختاره من الخطأ + الطريقة التي بنت الـ Structure.</p>
 
 ---
 
@@ -1814,14 +1749,12 @@ configs/default.yaml
 
 for active project-wide defaults.
 
-<p dir="rtl" align="right">الـ reference موجود للرجوع إلى إعدادات v3.2.0 الأصلية والمقارنة فقط. أثناء الشغل اليومي عدّل <code>default.yaml</code> أو الـ run-config الخاص بالـ PDF.</p>
 
 ---
 
 <a id="toc-4-1-3-structure-method-explained"></a>
 ## 4.1.3 Simple explanation of each `structure_method` + its parameters
 
-<p dir="rtl" align="right">القيمة <code>structure_method</code> لا تصف نوع الـ PDF نفسه، وإنما تصف <strong>الطريقة التي نجحت فعليًا في بناء الصفوف والأعمدة والخلايا في هذه الصفحة</strong>. لذلك هي أول شيء يجب أن تنظر إليه قبل تعديل أي Parameter. الجداول التالية تربط كل Method بالـ Parameters الفعلية الموجودة في <code>default.yaml</code> في v3.2.0، وتوضح اتجاه التعديل بشكل مبسط.</p>
 
 > **Baseline note:** The values below are the v3.2.0 defaults. `default.yaml` was verified to be semantically identical to `default_v3.2.0.reference.yaml` before the validated baseline run. The fixes documented in Section 15 were code-level generic fixes; the validated E2E was rerun without PDF-specific parameter tuning.
 
@@ -1831,7 +1764,6 @@ for active project-wide defaults.
 
 ### `bordered_grid`
 
-<p dir="rtl" align="right"><strong>جدول له خطوط وحدود واضحة.</strong> النظام رأى خطوطًا أفقية ورأسية تكوّن شبكة جدول، ثم استخدم تقاطعات هذه الخطوط لبناء الصفوف والأعمدة والخلايا.</p>
 
 **Think of it as:** `visible table lines → grid → cells`.
 
@@ -1856,13 +1788,11 @@ for active project-wide defaults.
 | `bordered_table.cells.minimum_height_px` | `10` | Rejects cells shorter than this. | **Lower** for short real rows; **raise** to filter tiny false rows. |
 | `bordered_table.cells.minimum_area_px` | `150` | Rejects cells below this pixel area. | **Lower** if small legitimate cells disappear; **raise** if tiny noise cells survive. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو عندك 7 أعمدة لكن ظهر 6 لأن خطًا رأسيًا مكسور، ابدأ بزيادة <code>bordered_table.vertical.merge_gap_px</code> قليلًا. لو ظهر خط رأسي كاذب من Noise، ارفع <code>vertical.minimum_line_length_ratio</code> بدلًا من تغيير كل إعدادات الأعمدة.</p>
 
 ---
 
 ### `opencv_shaded_grid`
 
-<p dir="rtl" align="right"><strong>الجدول تم اكتشافه من التظليل أو الخلفيات المختلفة للخلايا، وليس اعتمادًا على الخطوط فقط.</strong> هذه الطريقة مناسبة جدًا للجداول التي تحتوي خلايا رمادية/مظللة أو فواصل فاتحة لا يلتقطها Line Detector التقليدي.</p>
 
 **Think of it as:** `cell shading/background blocks → aligned grid → cells`.
 
@@ -1922,13 +1852,11 @@ for active project-wide defaults.
 | `table_split_gap_height_factor` | `4.0` | Row-height based split threshold. | **Lower** if separate blocks stay merged; **raise** for very tall/wrapped rows. |
 | `confidence_rows_target` | `4` | Number of rows needed to reach full row-count confidence contribution. | **Lower** for valid very short tables; **raise** if tiny patterns get overconfident. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو الخلايا الرمادية موجودة لكن النظام لا يلتقط الخلايا الصغيرة، قلّل <code>minimum_component_width_px</code> و/أو <code>minimum_component_height_px</code> تدريجيًا. لو Background كامل يتحول إلى Cell ضخمة، ارفع <code>contrast_deltas</code> أو شدّد <code>maximum_component_*_ratio</code>.</p>
 
 ---
 
 ### `opencv_projection_grid`
 
-<p dir="rtl" align="right"><strong>النظام بنى الجدول من توزيع الحبر/النص بصريًا على الصورة.</strong> لا يحتاج قراءة الكلمات؛ يحول الكتابة إلى Components ويستخدم مواقعها والفجوات والمحاذاة المتكررة لبناء الصفوف والأعمدة.</p>
 
 **Think of it as:** `ink density + whitespace/alignment → rows/columns → cells`.
 
@@ -1976,13 +1904,11 @@ The following parameters behave the same way as in `opencv_shaded_grid`:
 | `outer_padding_px` | `0` | Raise if edge content is cut. |
 | `minimum_column_width_px` | `12` | Lower to keep narrow true columns; raise to remove ghost columns. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو Description طويل اتقسم إلى عدة Columns كاذبة، غالبًا <code>intra_block_merge_gap_px</code> صغير جدًا أو <code>x_alignment_tolerance</code> غير مناسب. لو عمودان حقيقيان اندمجوا، اعكس الاتجاه ولا تستمر في زيادة merge tolerances.</p>
 
 ---
 
 ### `easyocr_detection_spatial`
 
-<p dir="rtl" align="right"><strong>الطرق البصرية العادية لم تكن كافية، لذلك استخدم النظام EasyOCR/CRAFT لمعرفة أماكن وجود النص فقط.</strong> في Crop-only يتم تحميل الـ Detector فقط مع <code>recognizer=false</code>، ثم تُستخدم Bounding Boxes مكانيًا لبناء الصفوف والأعمدة والخلايا.</p>
 
 **Think of it as:** `where text exists → spatial clustering → rows/columns → cells`.
 
@@ -2035,13 +1961,11 @@ CRAFT only says **where text exists**. The boxes are then passed through the sam
 | `maximum_columns` | `12` | Lower to suppress overcounting; raise for genuinely wider tables. |
 | `borderless_table.clustering.min_samples` | `1` | Raise to reject singleton/noisy alignments; keep `1` for sparse documents. |
 
-<p dir="rtl" align="right"><strong>مهم:</strong> في هذا الـ Method لا تبدأ بتغيير <code>borderless_table.column_detection.*</code> إذا كان ملف <code>07c_text_detection_boxes.png</code> نفسه ناقصًا. أصلح CRAFT Detection أولًا، ثم انتقل إلى Row/Column clustering.</p>
 
 ---
 
 ### `native_digital_spatial`
 
-<p dir="rtl" align="right"><strong>الصفحة Digital وبداخل الـ PDF نفسه Text له إحداثيات جاهزة.</strong> لا يحتاج OCR لاكتشاف أماكن الكلمات؛ PyMuPDF يوفر الكلمات والـ Bounding Boxes مباشرة، ثم يستخدم النظام Spatial Clustering لبناء Structure.</p>
 
 **Think of it as:** `native PDF word coordinates → spatial clustering → cells`.
 
@@ -2071,13 +1995,11 @@ CRAFT only says **where text exists**. The boxes are then passed through the sam
 | `maximum_columns` | `12` | Maximum retained columns. | **Lower** if severe overcounting; **raise** for genuine tables with >12 columns. |
 | `clustering.min_samples` | `1` | Minimum samples in DBSCAN X clusters. | **Raise** to suppress singleton X noise; keep low for sparse pages. |
 
-<p dir="rtl" align="right"><strong>مثال سريع:</strong> لو الـ Digital PDF صحيح لكن Column 3 و4 اندمجوا، غالبًا قلّل <code>minimum_column_gap_px</code> و/أو <code>x_tolerance_px</code> تدريجيًا. لو Description يصنع عشرات الأعمدة الكاذبة، ارفع <code>minimum_column_support_rows</code> أو <code>minimum_column_support_ratio</code>.</p>
 
 ---
 
 ### `borderless_spatial`
 
-<p dir="rtl" align="right"><strong>جدول بدون حدود واضحة وتم بناؤه من مواقع الكلمات.</strong> الـ Geometry هنا مثل <code>native_digital_spatial</code> تقريبًا، لكن مصدر Word Boxes قد يكون OCR Recognition بدل النص الرقمي الأصلي.</p>
 
 **Think of it as:** `recognized/native word positions without ruling lines → row/column clustering`.
 
@@ -2093,13 +2015,11 @@ When the word boxes came from full OCR, OCR box quality can also affect the stru
 | `ocr.easyocr.width_ths`, `ycenter_ths`, `height_ths` | Controls how EasyOCR groups detected pieces before returning word boxes. |
 | `ocr.easyocr.modes.*` | Per-mode settings for `sparse`, `row`, `single_line`, etc. |
 
-<p dir="rtl" align="right"><strong>تشخيص مهم:</strong> لو Word Boxes نفسها خاطئة أو ناقصة، أصلح OCR Detection/Recognition أولًا. لو Word Boxes صحيحة لكن Rows/Columns غلط، عدّل Borderless spatial parameters فقط.</p>
 
 ---
 
 ### `opencv_anchor_projection` / `anchor_row_segmentation`
 
-<p dir="rtl" align="right"><strong>النظام يستخدم Anchor متكرر لتحديد بداية/مركز كل Record.</strong> الـ Anchor يمكن أن يكون Amount أو Date أو Digit line، ويمكن استخراجه من Projection أو Words/OCR حسب <code>candidate_source</code>. هذه الطريقة أقوى عندما كل Row منطقي يحتوي Anchor ثابت.</p>
 
 **Think of it as:** `repeated anchor → row bands → configured/inferred columns → cells`.
 
@@ -2146,7 +2066,6 @@ These matter when `candidate_source: projection`:
 
 ### `none`
 
-<p dir="rtl" align="right"><strong>لم تنجح أي طريقة في بناء Structure موثوق للصفحة.</strong> هنا لا يوجد Parameter family واحدة اسمها <code>none</code>. المطلوب هو تحديد أي Stage منع كل الطرق من النجاح.</p>
 
 **Think of it as:** `no reliable structure was built yet`.
 
@@ -2182,13 +2101,11 @@ These matter when `candidate_source: projection`:
 8. If structure_method becomes a real method, move to that method's table above.
 ```
 
-<p dir="rtl" align="right"><strong>ممنوع تبدأ مثلًا بتغيير <code>x_tolerance_px</code> لأن الناتج 0 Columns بينما <code>structure_method = none</code>.</strong> الـ Column clustering لم يحصل أصلًا. أولًا لازم نعرف لماذا لم نصل إلى Rows/Boxes/Grid صالحة.</p>
 
 ---
 
 ### Quick decision rule
 
-<p dir="rtl" align="right">لو وجدت خطأ في الناتج، اقرأ <code>structure_method</code> أولًا ثم عدّل Parameters التابعة لنفس الطريقة. لو تغيّرت <code>structure_method</code> بعد تجربة Parameter، توقف عن الاستمرار بنفس الاتجاه وراجع النتيجة من جديد لأن Detector آخر أصبح هو الفائز.</p>
 
 ```text
 bordered_grid
@@ -2225,11 +2142,9 @@ none
 <a id="toc-4-2-column-errors"></a>
 ## 4.2 Column Detection Errors
 
-<p dir="rtl" align="right">أخطاء اكتشاف الأعمدة تتعلق بعدد الأعمدة ومواقع حدودها وثباتها عبر الصفوف والصفحات. ابدأ من هذا القسم عندما تكون البيانات في الأعمدة الخطأ أو عندما يزيد/ينقص عدد الأعمدة.</p>
 
 ### C1 — Columns merged / undercounted
 
-<p dir="rtl" align="right"><strong>دمج الأعمدة / اكتشاف عدد أعمدة أقل من الصحيح:</strong> يحدث عندما يعتبر النظام عمودين متجاورين عمودًا واحدًا. ستلاحظ أن عدد الأعمدة في الناتج أقل من المصدر وأن قيم عمودين أصبحت داخل حقل واحد؛ غالبًا تحتاج إلى تقليل سماحية الدمج أو فجوة الفصل بحسب طريقة الكشف.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2241,7 +2156,6 @@ none
 <!-- tuning-recipe:C1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان عدد الأعمدة أقل من الصحيح، قلّل قيم الدمج تدريجيًا. الهدف هو جعل النظام أقل استعدادًا لاعتبار مركزين متجاورين عمودًا واحدًا.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2258,7 +2172,6 @@ none
 
 ### C2 — Columns split / overcounted
 
-<p dir="rtl" align="right"><strong>تقسيم العمود الواحد / اكتشاف أعمدة أكثر من الصحيح:</strong> يحدث عندما يفسر النظام مسافة كبيرة داخل نفس العمود على أنها فاصل بين عمودين. تظهر أعمدة إضافية فارغة أو شبه فارغة أو ينقسم محتوى عمود منطقي إلى أكثر من عمود.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2270,7 +2183,6 @@ none
 <!-- tuning-recipe:C2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا ظهر عدد أعمدة أكبر من المصدر، اعكس اتجاه C1: اجعل التجميع أكثر تساهلًا حتى تندمج المراكز المكررة/الوهمية بدون دمج أعمدة حقيقية.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2286,7 +2198,6 @@ none
 
 ### C3 — Column boundary drift across rows
 
-<p dir="rtl" align="right"><strong>انحراف حدود الأعمدة بين الصفوف:</strong> يعني أن مواقع الأعمدة لا تبقى ثابتة من صف إلى آخر، وغالبًا يكون السبب ميل الصفحة أو دورانها. تظهر القيم وكأنها تتنقل بين عمودين متجاورين عبر الصفوف.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2298,7 +2209,6 @@ none
 <!-- tuning-recipe:C3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">ابدأ بإصلاح ميل الصفحة قبل توسيع سماحية الأعمدة. استخدام Tolerance كبيرة لإخفاء Skew قد يحل صفًا ويكسر صفوفًا أخرى.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2312,7 +2222,6 @@ none
 
 ### C4 — No columns detected in borderless table
 
-<p dir="rtl" align="right"><strong>عدم اكتشاف أعمدة في جدول بدون حدود:</strong> يظهر عندما يعيد النظام عمودًا واحدًا أو لا يستطيع تكوين أعمدة مستقرة في جدول Borderless. السبب عادة نقص دعم مواقع X المتكررة أو عدم توفر كلمات OCR في وضع يعتمد على Geometry فقط.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2324,7 +2233,6 @@ none
 <!-- tuning-recipe:C4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عدم وجود أعمدة في Borderless يعني أن أدلة X غير كافية أو شروط قبول الصفوف/الأعمدة صارمة. خففها تدريجيًا حسب الـ structure_method، ولا تغيّر كل المسارات معًا.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2341,7 +2249,6 @@ none
 
 ### C5 — False column boundary from noise
 
-<p dir="rtl" align="right"><strong>حد عمود وهمي بسبب الضوضاء:</strong> يحدث عندما تُفهم علامة مائية أو خط عشوائي أو أثر Scan على أنه فاصل عمود حقيقي. النتيجة المعتادة عمود إضافي شبه فارغ لا يقابله عمود في المصدر.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2353,7 +2260,6 @@ none
 <!-- tuning-recipe:C5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند ظهور عمود وهمي ارفع شروط الدليل بدل حذف الأعمدة يدويًا. الهدف أن يحتاج العمود إلى دعم من صفوف أكثر أو خطوط أطول قبل قبوله.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2369,7 +2275,6 @@ none
 
 ### C6 — Wrapped cell text becomes adjacent column
 
-<p dir="rtl" align="right"><strong>النص الملتف داخل الخلية انتقل إلى عمود مجاور:</strong> يحدث عندما يُفسر السطر الثاني من خلية متعددة الأسطر كجزء من عمود آخر. راجع تجميع الصفوف أولًا ثم سماحية X وحدود الأعمدة.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2381,7 +2286,6 @@ none
 <!-- tuning-recipe:C6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">هذه المشكلة غالبًا تبدأ من تجميع الصفوف قبل الأعمدة. اجعل السطر الثاني أقرب منطقيًا للصف السابق أولًا، ثم عدّل X فقط إذا بقيت المشكلة.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2395,7 +2299,6 @@ none
 
 ### C7 — Column count varies page to page
 
-<p dir="rtl" align="right"><strong>عدد الأعمدة يختلف من صفحة لأخرى:</strong> يعني أن Geometry المناسبة لصفحة لا تصلح لكل الصفحات. افحص الصفحات بشكل مستقل واستخدم <code>page_overrides</code> عند وجود Templates مختلفة بدل فرض حدود ثابتة عالميًا.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2407,7 +2310,6 @@ none
 <!-- tuning-recipe:C7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا تحاول حل اختلاف Templates بقيمة عالمية واحدة. استخدم Page Overrides للصفحات المختلفة، واحفظ القيم العامة Generic.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2420,7 +2322,6 @@ none
 
 ### C8 — Numeric/text alignment inconsistency
 
-<p dir="rtl" align="right"><strong>اختلاف محاذاة الأعمدة الرقمية والنصية:</strong> تظهر المشكلة عندما تنجح الأعمدة النصية بينما تندمج أو تنقسم الأعمدة الرقمية بسبب اختلاف المحاذاة يمين/يسار. الحل الأفضل قد يتطلب حدودًا صريحة أو منطقًا خاصًا بحسب نوع العمود.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2432,7 +2333,6 @@ none
 <!-- tuning-recipe:C8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">الأعمدة الرقمية Right-aligned قد تغيّر مراكز X مقارنة بالنصوص. استخدم الـ word-height-aware tolerance قبل زيادة Pixel tolerance بشكل كبير.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2446,7 +2346,6 @@ none
 
 ### C9 — Merged header cells reduce header count
 
-<p dir="rtl" align="right"><strong>Header مدمج يقلل عدد أعمدة العنوان:</strong> يحدث عندما يحتوي Header على <code>colspan</code> أو خلايا مدمجة، فيكون عدد خلاياه المرئية أقل من عدد أعمدة البيانات. لا يجب ربط Header بالـ body اعتمادًا على العدد فقط؛ الموضع الهندسي أهم.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2458,7 +2357,6 @@ none
 <!-- tuning-recipe:C9 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Header colspan ليست مشكلة Tolerance رقمية أساسًا. لا تجبر عدد أعمدة الـHeader ليطابق الـData؛ افصل Header mapping عن Body geometry.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2473,11 +2371,9 @@ none
 <a id="toc-4-3-row-errors"></a>
 ## 4.3 Row Detection Errors
 
-<p dir="rtl" align="right">أخطاء اكتشاف الصفوف تتعلق بدمج سجلين معًا أو تقسيم سجل واحد أو التعامل الخاطئ مع Header/Footer والصفوف متعددة الأسطر أو الجداول الممتدة عبر صفحات.</p>
 
 ### R1 — Rows merged
 
-<p dir="rtl" align="right"><strong>دمج صفين أو أكثر في صف واحد:</strong> يحدث عندما تكون المسافة الرأسية بين سجلين صغيرة فيتعامل النظام معهما كسجل واحد. النتيجة صف يحتوي بيانات سجلين متتاليين.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2489,7 +2385,6 @@ none
 <!-- tuning-recipe:R1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند دمج صفين، اجعل التجميع الرأسي أكثر صرامة: قلّل سماحية الـbaseline والـcontinuation والـrow merge خطوة بخطوة.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2505,7 +2400,6 @@ none
 
 ### R2 — Rows split
 
-<p dir="rtl" align="right"><strong>تقسيم سجل واحد إلى أكثر من صف:</strong> يحدث غالبًا بسبب نص ملتف أو خلية متعددة الأسطر يتم تفسير سطرها الثاني كسجل جديد. يظهر صف إضافي يحتوي جزءًا من البيانات وتكون بقية خلاياه فارغة.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2517,7 +2411,6 @@ none
 <!-- tuning-recipe:R2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند تقسيم صف واحد إلى صفين، اعكس R1: زِد سماحية التجميع تدريجيًا حتى تلتصق الأسطر التابعة لنفس السجل بدون دمج سجلين مختلفين.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2533,7 +2426,6 @@ none
 
 ### R3 — Header misclassified
 
-<p dir="rtl" align="right"><strong>تصنيف Header بشكل خاطئ:</strong> يعني أن عنوان الأعمدة دخل ضمن البيانات أو أن أول صف بيانات حقيقي تم اعتباره Header وحذفه. راجع كلمات Header وقواعد إزالة العناوين المكررة.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2545,7 +2437,6 @@ none
 <!-- tuning-recipe:R3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Header classification يتم أساسًا بالـkeywords والبنية، وليس بتغيير Gap عشوائي. أضف كلمات الـHeader الفعلية إذا لم يتعرف عليها النظام.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2559,7 +2450,6 @@ none
 
 ### R4 — Blank rows dropped/created
 
-<p dir="rtl" align="right"><strong>حذف صفوف فارغة صحيحة أو إنشاء صفوف فارغة وهمية:</strong> يظهر عندما لا يتطابق عدد الصفوف مع المصدر بسبب Noise أو لأن المسار القائم على الكلمات لا يستطيع تمثيل صف خالٍ من النص. يحتاج أحيانًا إلى تمثيل صريح لحالة الصف الفارغ.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2571,7 +2461,6 @@ none
 <!-- tuning-recipe:R4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">هذا الخطأ له اتجاهان مختلفان: إذا كانت الصفوف الحقيقية Sparse تُحذف فخفف شروط Row support؛ إذا كان Noise يُنشئ صفوفًا وهمية فارفع الشروط.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2584,7 +2473,6 @@ none
 
 ### R5 — Skewed scan zigzags rows
 
-<p dir="rtl" align="right"><strong>ميل الصفحة يجعل خطوط الصفوف متعرجة:</strong> يحدث عندما لا يتم تصحيح Skew بدقة، فتتحرك Baselines لأعلى وأسفل عبر عرض الصفحة ويصبح فصل الصفوف غير ثابت.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2596,7 +2484,6 @@ none
 <!-- tuning-recipe:R5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">أصلح Deskew أولًا. لا تعالج Zigzag بتكبير Row/Column tolerances لأن ذلك قد يخفي الميل ويخلق دمجًا خاطئًا.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2609,7 +2496,6 @@ none
 
 ### R6 — Variable row height mishandled
 
-<p dir="rtl" align="right"><strong>عدم التعامل الصحيح مع اختلاف ارتفاع الصفوف:</strong> يحدث عندما تكون بعض الصفوف متعددة الأسطر أو أكبر من غيرها بينما تعتمد الإعدادات على سماحية واحدة. قد ينقسم صف أو يندمج مع الصف التالي.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2621,7 +2507,6 @@ none
 <!-- tuning-recipe:R6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">للصفوف متغيرة الارتفاع، زِد فقط سماحية continuation/line grouping المطلوبة للنص الملتف. إذا احتجت قيمًا مبالغًا فيها فانتقل إلى Anchor/content clustering بدل fixed-height assumptions.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2635,7 +2520,6 @@ none
 
 ### R7 — Footer/summary rows treated as data
 
-<p dir="rtl" align="right"><strong>اعتبار Footer أو Summary صف بيانات:</strong> يظهر عندما تدخل الإجماليات أو تذييل الصفحة أو نصوص النهاية ضمن Records العادية. يجب تمييزها بنيويًا أو استبعادها عند التصدير حسب المطلوب.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2647,7 +2531,6 @@ none
 <!-- tuning-recipe:R7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لمنع Footer من التحول إلى Data، ارفع الاتساق المطلوب للصفوف أو افصل الكتلة السفلية عندما توجد فجوة كبيرة. لا تحذف آخر N صفوف بشكل ثابت.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2661,7 +2544,6 @@ none
 
 ### R8 — Multi-page table continuation not linked
 
-<p dir="rtl" align="right"><strong>عدم ربط استمرار الجدول عبر الصفحات:</strong> يعني أن الجزء الموجود في الصفحة التالية يُعامل كجدول مستقل رغم أنه استمرار لنفس الجدول. هذه القدرة تحتاج Cross-page continuation logic في الكود الحالي.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2673,7 +2555,6 @@ none
 <!-- tuning-recipe:R8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا يوجد Parameter رقمي يربط الصفحات حاليًا. لا تضيع وقتًا في تغيير Tolerances؛ هذه وظيفة Cross-page state تحتاج Code enhancement.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2685,7 +2566,6 @@ none
 
 ### R9 — Crop-only returns zero rows/cells despite visible table
 
-<p dir="rtl" align="right"><strong>وضع القص يعمل لكن لا ينتج أي Rows أو Cells رغم وجود جدول واضح:</strong> في v3.1 يجب أن يمر Crop-only على أكثر من مصدر Geometry بدل الاعتماد على OCR. إذا بقي الناتج صفرًا فالمطلوب تحديد أي Evidence فشل: الخطوط التقليدية، الخلايا المظللة، أو Projection الخاص بالـ Borderless.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2697,7 +2577,6 @@ none
 <!-- tuning-recipe:R9 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان Crop-only يعطي 0 صفوف/خلايا، لا تبدأ من Column tolerance. حدد أول Stage فشل: ruled lines، shaded grid، projection، ثم detection-only CRAFT. خفف فقط المسار الذي لم يجد Evidence كافية.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2716,11 +2595,9 @@ none
 <a id="toc-4-4-cell-errors"></a>
 ## 4.4 Cell Detection Errors
 
-<p dir="rtl" align="right">أخطاء الخلايا تظهر بعد تحديد الصفوف والأعمدة، مثل Crop غير صحيح، خلايا مدمجة، خلايا فارغة غير واضحة، نص مائل/عمودي، أو OCR غير دقيق داخل خلية صحيحة.</p>
 
 ### CELL1 — No cell boundary in borderless table
 
-<p dir="rtl" align="right"><strong>عدم وجود حدود خلية في جدول بدون خطوط:</strong> في الجداول Borderless لا توجد خطوط فعلية لكل خلية، لذلك يجب اشتقاق الخلايا من تقاطع حدود الصفوف والأعمدة المنطقية بدل انتظار Contour مستقل لكل خلية.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2732,7 +2609,6 @@ none
 <!-- tuning-recipe:CELL1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Borderless cells تأتي من تقاطع Row bands مع Column boundaries، لذلك عدّل الـdetector الذي أنتج الـStructure بدل البحث عن contour لكل خلية.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2747,7 +2623,6 @@ none
 
 ### CELL2 — Merged cells rowspan/colspan misalign grid
 
-<p dir="rtl" align="right"><strong>الخلايا المدمجة تفسد محاذاة الشبكة:</strong> يحدث عند وجود <code>rowspan</code> أو <code>colspan</code> بينما يفترض النظام شبكة موحدة. بعد الخلية المدمجة قد تتحرك البيانات إلى عمود أو صف غير صحيح.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2759,7 +2634,6 @@ none
 <!-- tuning-recipe:CELL2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا يوجد Span model حاليًا؛ تغيير Tolerances قد يخفي المشكلة لكنه لن يفهم rowspan/colspan بشكل صحيح.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2771,7 +2645,6 @@ none
 
 ### CELL3 — Ambiguous empty cell
 
-<p dir="rtl" align="right"><strong>خلية فارغة أم فشل OCR؟:</strong> المشكلة أن قيمة فارغة في الناتج لا توضح هل المصدر فارغ فعلًا أم أن OCR حاول ولم يقرأ النص. الحل الكامل يحتاج حالة Metadata منفصلة للفراغ المؤكد وفشل القراءة.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2783,7 +2656,6 @@ none
 <!-- tuning-recipe:CELL3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Confidence threshold لا يستطيع وحده إثبات أن الخلية فارغة فعلًا. لا تخفضه فقط لإخفاء Empty OCR؛ المطلوب Metadata يفرق بين confirmed blank وOCR miss.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2796,7 +2668,6 @@ none
 
 ### CELL4 — Crop margin too tight
 
-<p dir="rtl" align="right"><strong>هامش Crop ضيق جدًا:</strong> يقطع جزءًا من الحروف القريبة من حدود الخلية، فتظهر قيم ناقصة خصوصًا أول أو آخر حرف. زد Padding تدريجيًا مع مراجعة الـ crop.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2808,7 +2679,6 @@ none
 <!-- tuning-recipe:CELL4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان أول/آخر حرف مقطوعًا، زِد Padding في الجهة المقطوعة فقط وبخطوات صغيرة. لا تزِد الأربع جهات تلقائيًا.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2823,7 +2693,6 @@ none
 
 ### CELL5 — Crop margin too wide
 
-<p dir="rtl" align="right"><strong>هامش Crop واسع جدًا:</strong> يدخل جزءًا من محتوى الخلية المجاورة داخل الصورة الحالية، فيقرأ OCR نصين معًا. قلل Padding وتأكد من عدم تداخل الصناديق.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2835,7 +2704,6 @@ none
 <!-- tuning-recipe:CELL5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا دخل نص الجار في الـCrop، قلّل Padding في الجهة التي يحدث منها التسريب فقط.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2849,7 +2717,6 @@ none
 
 ### CELL6 — OCR misreads correct crop
 
-<p dir="rtl" align="right"><strong>OCR يخطئ رغم أن Crop صحيح:</strong> إذا كانت حدود الخلية سليمة لكن النص الناتج خاطئ، فالمشكلة انتقلت إلى جودة الصورة أو DPI أو Preprocessing أو إعدادات/نموذج OCR، وليس إلى Geometry.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2861,7 +2728,6 @@ none
 <!-- tuning-recipe:CELL6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا تغيّر OCR قبل إثبات أن Crop صحيح. بعد ذلك ارفع جودة الصورة تدريجيًا، ثم جرّب Recognition settings؛ لا تبدأ بنموذج مخصص مباشرة.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2878,7 +2744,6 @@ none
 
 ### CELL7 — Rotated/vertical text misread
 
-<p dir="rtl" align="right"><strong>النص المدور أو الرأسي لا يُقرأ:</strong> يظهر في خلايا ذات اتجاه مختلف عن بقية الصفحة، مثل Header رأسي. يمكن تجربة <code>rotation_info</code>، لكن المعالجة الدقيقة لكل خلية تحتاج Orientation stage مخصص.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2890,7 +2755,6 @@ none
 <!-- tuning-recipe:CELL7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا كان الخطأ محصورًا في نص مدوّر، فعّل زوايا Rotation بدل تغيير DPI/threshold لكل الصفحة.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2902,7 +2766,6 @@ none
 
 ### CELL8 — Arabic/RTL/diacritics misread
 
-<p dir="rtl" align="right"><strong>أخطاء العربية وRTL والتشكيل أو الخلايا المختلطة:</strong> تظهر كحروف عربية معكوسة/مبعثرة أو أخطاء عند مزج العربية بالأرقام. راجع لغات EasyOCR وترتيب RTL، وقد تحتاج نموذج Recognition مخصص إذا تكرر النمط.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2914,7 +2777,6 @@ none
 <!-- tuning-recipe:CELL8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">تأكد أولًا أن العربية والإنجليزية مفعّلتان، ثم جرّب Decoder أقوى قبل الانتقال إلى Custom model. لا تغيّر Geometry إذا الـCrop صحيح.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2929,7 +2791,6 @@ none
 
 ### CELL9 — Numeric formatting parsed incorrectly
 
-<p dir="rtl" align="right"><strong>تحليل التنسيق الرقمي بشكل غير صحيح:</strong> تحدث عند التباس الفاصلة العشرية وفاصل الآلاف أو رموز العملة والأرقام العربية. يجب أن تمر القيم الرقمية عبر Normalization واعٍ بنمط الأرقام المتوقع.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2941,7 +2802,6 @@ none
 <!-- tuning-recipe:CELL9 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">هذه مشكلة Parsing/Schema أكثر من كونها Tolerance. لا تحاول إصلاح الفاصلة العشرية بتغيير OCR geometry.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2955,11 +2815,9 @@ none
 <a id="toc-4-5-table-boundary-errors"></a>
 ## 4.5 Table Boundary Detection Errors
 
-<p dir="rtl" align="right">أخطاء حدود الجدول تتعلق بتحديد مكان بداية ونهاية الجدول أو فصل عدة جداول أو استبعاد النصوص والشعارات والعلامات المائية المحيطة بالجدول.</p>
 
 ### T1 — Table start/end boundary missed with multiple tables
 
-<p dir="rtl" align="right"><strong>فقد بداية/نهاية الجدول عند وجود عدة جداول:</strong> يحدث عندما تُجمع كتلتان جدوليّتان منفصلتان في Region واحدة، خصوصًا في Borderless. تحتاج الصفحة إلى منطق يفصل الجداول باستخدام الفجوات أو تغيّر البنية.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2971,7 +2829,6 @@ none
 <!-- tuning-recipe:T1 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لفصل جدولين ملتصقين رأسيًا، اجعل شرط الانقسام أقل صرامة: قلّل عوامل/نسب فجوة الفصل تدريجيًا. إذا انقسم جدول واحد بالخطأ اعكس الاتجاه.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -2985,7 +2842,6 @@ none
 
 ### T2 — False positive non-table content
 
-<p dir="rtl" align="right"><strong>اعتبار نص عادي جدولًا:</strong> يحدث عندما تبدو فقرة كثيفة أو قائمة وكأن لها محاذاة أعمدة. يجب رفع شروط الاتساق والتحقق من أن Candidate لديه بنية صفوف وأعمدة حقيقية قبل قبوله.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -2997,7 +2853,6 @@ none
 <!-- tuning-recipe:T2 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">عند اعتبار Paragraph جدولًا، ارفع شروط الاتساق بدل محاولة حذف Region يدويًا.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3012,7 +2867,6 @@ none
 
 ### T3 — Boundary cut off prematurely
 
-<p dir="rtl" align="right"><strong>حدود الجدول تتوقف قبل نهايته:</strong> تظهر عندما تكون الصفوف السفلية مفقودة لأن Region انتهت عند خط أو فجوة داخلية بدل نهاية الجدول الحقيقية. راجع line detection والـ closing والـ region overlay.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3024,7 +2878,6 @@ none
 <!-- tuning-recipe:T3 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">إذا توقفت الحدود قبل آخر صف، أصلح الخطوط المكسورة أو منع الانقسام الداخلي المبكر حسب الـstructure_method.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3038,7 +2891,6 @@ none
 
 ### T4 — Multi-page table not linked
 
-<p dir="rtl" align="right"><strong>الجدول الممتد على صفحات يظهر كجداول منفصلة:</strong> هو نفس مفهوم الاستمرار بين الصفحات ولكن على مستوى Table Region. يحتاج النظام إلى ربط الصفحات المتتالية عندما تتطابق Geometry ولا يبدأ جدول جديد فعليًا.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3050,7 +2902,6 @@ none
 <!-- tuning-recipe:T4 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا توجد قيمة Config تربط Table regions بين الصفحات. استخدم Fix 2 بدل تعديل Gap/Tolerance.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3062,7 +2913,6 @@ none
 
 ### T5 — Nested table double-counted
 
-<p dir="rtl" align="right"><strong>اكتشاف جدول داخلي مرتين:</strong> يحدث عندما يتم احتساب Sub-table ضمن الجدول الأب ثم كمنطقة مستقلة أيضًا، فتتكرر البيانات. قد يلزم Containment/Deduplication صريح للحالات التي لا يمنعها contour retrieval الحالي.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3074,7 +2924,6 @@ none
 <!-- tuning-recipe:T5 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">لا يوجد Containment-dedupe parameter صريح حاليًا. لا تحاول حل التكرار بتغيير minimum area عشوائيًا لأنه قد يحذف جداول حقيقية.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3086,7 +2935,6 @@ none
 
 ### T6 — Watermark/logo/margin distorts boundary
 
-<p dir="rtl" align="right"><strong>Logo أو Watermark أو الهوامش توسع حدود الجدول:</strong> تدخل عناصر الصفحة غير الجدولية في الكشف فتنتج Region أكبر من الجدول أو Ghost table. ابدأ بالـ preprocessing والفلترة، وقد تحتاج Content ROI ثابتًا لهذه الفئة.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3098,7 +2946,6 @@ none
 <!-- tuning-recipe:T6 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">ابدأ برفع شروط الخط/الاتساق حتى لا تدخل العلامات القصيرة والـLogo في الجدول. إذا كان العنصر كبيرًا ويظل داخل Region فالحل الحقيقي Content ROI.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3113,7 +2960,6 @@ none
 
 ### T7 — Inconsistent page template breaks fixed boundary
 
-<p dir="rtl" align="right"><strong>اختلاف Template الصفحات يكسر حدودًا ثابتة:</strong> يحدث عندما تُستخدم Geometry واحدة لصفحات ذات تنسيقات مختلفة. الأفضل الكشف لكل صفحة واستخدام Overrides فقط للصفحات الاستثنائية أو مجموعات Template مؤكدة.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3125,7 +2971,6 @@ none
 <!-- tuning-recipe:T7 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">Template مختلف = إعداد مختلف على مستوى الصفحة/المجموعة، وليس قيمة عالمية واحدة. استخدم `page_overrides` ولا تغيّر الـbaseline الذي يعمل على بقية الصفحات.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3138,7 +2983,6 @@ none
 
 ### T8 — Blurred scan breaks boundary polygon
 
-<p dir="rtl" align="right"><strong>الـ Scan الباهت أو المشوش يكسر إطار الجدول:</strong> عندما تكون الخطوط متقطعة أو باهتة لا تتكون Polygon مغلقة. يمكن تقوية Morphological closing وتقليل شروط طول الخط بحذر حتى تتصل الحدود بدون خلق خطوط وهمية.</p>
 
 | Diagnostic field | Details |
 |---|---|
@@ -3150,7 +2994,6 @@ none
 <!-- tuning-recipe:T8 -->
 #### Parameter tuning recipe
 
-<p dir="rtl" align="right">للـScan الباهت، حسّن الاتصال بين الخطوط تدريجيًا. غيّر Parameter واحدًا كل مرة لأن Denoise/closing/line length يمكن أن تصنع خطوطًا وهمية إذا بالغت فيها.</p>
 
 | Parameter | v3.2 baseline | First trial | Second trial | Use when |
 |---|---:|---:|---:|---|
@@ -3169,16 +3012,13 @@ none
 <a id="toc-5-debugging-rules"></a>
 # 5. Stage-by-stage debugging rules
 
-<p dir="rtl" align="right">هذا القسم يحول التشخيص إلى خطوات عملية حسب مرحلة الـ Pipeline. استخدمه بعد تحديد نوع الخطأ لمعرفة الملفات والـ Parameters والـ Debug Artifacts التي يجب مراجعتها.</p>
 
 <a id="toc-5-1-column-debug"></a>
 ## 5.1 Column detection
 
-<p dir="rtl" align="right">مرجع عملي لتصحيح اكتشاف الأعمدة، مع فصل طريقة التعامل مع الجداول بدون حدود عن الجداول ذات الخطوط والحدود.</p>
 
 ### Borderless path
 
-<p dir="rtl" align="right">هذا المسار خاص بالجداول التي لا تحتوي على خطوط فاصلة واضحة، ويعتمد أكثر على مواقع النصوص والتجميع والمسافات بين الأعمدة.</p>
 
 Primary parameters:
 
@@ -3201,7 +3041,6 @@ Key behavior in the current implementation:
 
 ### Bordered path
 
-<p dir="rtl" align="right">هذا المسار خاص بالجداول ذات الخطوط أو الشبكة، ويعتمد على اكتشاف الخطوط والـ contours والمورفولوجي لتحديد الحدود.</p>
 
 Primary parameters:
 
@@ -3218,7 +3057,6 @@ Inspect `05_horizontal_lines.png`, `06_vertical_lines.png`, and `10_detected_cel
 <a id="toc-5-2-row-debug"></a>
 ## 5.2 Row detection
 
-<p dir="rtl" align="right">مرجع ضبط اكتشاف الصفوف، خاصة مشاكل المسافات الرأسية، النص الملتف، الـ anchors، وتفاوت ارتفاع الصفوف.</p>
 
 Normal borderless rows use baseline clustering + optional continuation merging.
 
@@ -3234,7 +3072,6 @@ When records have a stable per-row anchor, prefer anchor segmentation rather tha
 <a id="toc-5-3-cell-debug"></a>
 ## 5.3 Cell detection
 
-<p dir="rtl" align="right">مرجع مراجعة الـ cell boxes والـ crops والـ padding والتأكد أن كل خلية تغطي المحتوى المطلوب فقط قبل تشغيل OCR.</p>
 
 - Bordered cells are the Cartesian grid between detected line positions.
 - Borderless cells are row bands × inferred column boundaries.
@@ -3244,7 +3081,6 @@ When records have a stable per-row anchor, prefer anchor segmentation rather tha
 <a id="toc-5-4-table-debug"></a>
 ## 5.4 Table boundaries
 
-<p dir="rtl" align="right">مرجع تشخيص منطقة الجدول نفسها قبل تقسيمها إلى صفوف وأعمدة، خصوصًا عند وجود أكثر من جدول أو عناصر صفحة قريبة منه.</p>
 
 - Bordered detector can return multiple external table regions on one page.
 - Borderless detector currently creates one table covering all words on the page.
@@ -3255,14 +3091,12 @@ When records have a stable per-row anchor, prefer anchor segmentation rather tha
 <a id="toc-6-fix-library"></a>
 # 6. Fix-it code library — when configuration is not enough
 
-<p dir="rtl" align="right">مكتبة حلول برمجية للحالات التي لا يكفي فيها تغيير Parameters. لا تستخدم هذه التعديلات قبل إثبات أن المشكلة ليست قابلة للحل بالإعدادات الحالية.</p>
 
 These are source-level fixes for required behaviors that are not currently implemented. Add them only after a config-only approach has been ruled out.
 
 <a id="toc-6-fix-1"></a>
 ## Fix 1 — Separate multiple borderless tables by vertical gaps
 
-<p dir="rtl" align="right">حل برمجي لفصل أكثر من جدول Borderless في الصفحة نفسها باستخدام الفجوات الرأسية الكبيرة بين مجموعات المحتوى.</p>
 
 **Use when:** two unrelated borderless tables on one page are combined into `table_01`.
 
@@ -3299,7 +3133,6 @@ Then run the existing row/column reconstruction independently per block and assi
 <a id="toc-6-fix-2"></a>
 ## Fix 2 — Link multi-page table continuations
 
-<p dir="rtl" align="right">حل لربط أجزاء الجدول نفسه عند استمراره من صفحة إلى أخرى بدل التعامل مع كل صفحة كجدول مستقل.</p>
 
 **Use when:** one logical table spans pages and must remain one dataset/table identity.
 
@@ -3332,7 +3165,6 @@ For a stronger implementation, compare normalized column boundary ratios rather 
 <a id="toc-6-fix-3"></a>
 ## Fix 3 — Filter footer/summary rows without deleting legitimate totals blindly
 
-<p dir="rtl" align="right">حل لتمييز Footer أو Summary rows عن البيانات الفعلية بدون حذف صفوف الإجماليات الصحيحة بشكل عشوائي.</p>
 
 `DataReconstructor` already sets `row.is_total`. Add an explicit export policy instead of silently treating totals as ordinary records:
 
@@ -3357,7 +3189,6 @@ Do not hardcode "bottom N rows" as footer logic.
 <a id="toc-6-fix-4"></a>
 ## Fix 4 — Distinguish confirmed blank from OCR failure
 
-<p dir="rtl" align="right">حل لإضافة حالة واضحة تفرق بين خلية فارغة فعلًا وبين خلية تحتوي محتوى لكن OCR فشل في قراءته.</p>
 
 Add a state to `ExtractedCell`:
 
@@ -3382,7 +3213,6 @@ Use a simple ink-density check on the final cell crop; keep the raw crop as evid
 <a id="toc-6-fix-5"></a>
 ## Fix 5 — Detect merged bordered cells / spans
 
-<p dir="rtl" align="right">حل لدعم الخلايا المدمجة <code>rowspan/colspan</code> في الجداول ذات الحدود بدل فرض شبكة موحدة على كل الخلايا.</p>
 
 **Use when:** a missing internal ruling creates a cell wider/taller than the modal grid.
 
@@ -3406,7 +3236,6 @@ A production version must confirm spans against missing internal line evidence b
 <a id="toc-6-fix-6"></a>
 ## Fix 6 — Per-cell orientation handling
 
-<p dir="rtl" align="right">حل لاكتشاف اتجاه النص داخل كل خلية وتدويرها عند الحاجة قبل OCR، خاصة للعناوين الرأسية أو النصوص المدورة.</p>
 
 First try the configuration-only EasyOCR option:
 
@@ -3438,7 +3267,6 @@ Accept by confidence **and** semantic validation where possible.
 <a id="toc-6-fix-7"></a>
 ## Fix 7 — Add bordered-table content ROI to ignore page furniture
 
-<p dir="rtl" align="right">حل لتحديد منطقة بحث مخصصة للجدول واستبعاد Header/Footer/Logo والعناصر الثابتة التي قد تشوش اكتشاف الحدود.</p>
 
 Add config:
 
@@ -3452,7 +3280,6 @@ Crop the binary image to ROI before line detection, then add the ROI origin back
 <a id="toc-6-fix-8"></a>
 ## Fix 8 — Explicit header-body mapping when header uses colspan
 
-<p dir="rtl" align="right">حل لربط Header يحتوي على خلايا مدمجة بأعمدة البيانات الفعلية اعتمادًا على المواضع بدل الاعتماد على تساوي عدد الخلايا.</p>
 
 Do not infer body column count from header cell count. Detect body columns from data rows, then map header text to body column intervals by overlap:
 
@@ -3469,7 +3296,6 @@ Store header span metadata rather than shifting body cells.
 <a id="toc-6-fix-9"></a>
 ## Fix 9 — Page-template grouping without file-specific profiles
 
-<p dir="rtl" align="right">حل لتجميع الصفحات المتشابهة في Template واحد وإعادة استخدام Geometry بينها بدون إنشاء Profiles مرتبطة باسم بنك أو شركة أو ملف.</p>
 
 If pages fall into a small number of layouts, group them by measured signatures rather than PDF name:
 
@@ -3486,7 +3312,6 @@ Tune per layout signature, then store the differences in `page_overrides`. This 
 <a id="toc-7-troubleshooting-flow"></a>
 # 7. End-to-end troubleshooting decision flow
 
-<p dir="rtl" align="right">شجرة قرار كاملة لتحديد نقطة الفشل من البداية للنهاية. اتبعها بالترتيب عندما لا تعرف هل المشكلة من PDF أو Preprocessing أو Geometry أو OCR أو Reconstruction أو Validation.</p>
 
 ```text
 START
@@ -3543,7 +3368,6 @@ START
 <a id="toc-8-validation-codes"></a>
 # 8. Validation issue codes and what they mean
 
-<p dir="rtl" align="right">مرجع لأكواد Validation التي قد تظهر بعد الاستخراج، وما الذي يعنيه كل كود وأي مرحلة يجب فحصها لمعالجة السبب الحقيقي.</p>
 
 Current validator can emit:
 
@@ -3571,12 +3395,10 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-cli"></a>
 # 9. CLI command reference
 
-<p dir="rtl" align="right">مرجع أوامر سطر الأوامر الرئيسية للمشروع. استخدمه لمعرفة وظيفة كل Command ومتى يتم تشغيله أثناء التحليل أو التشخيص أو الاستخراج أو الضبط.</p>
 
 <a id="toc-9-analyze"></a>
 ## `analyze`
 
-<p dir="rtl" align="right">يحلل خصائص صفحات PDF ونوعها وتخطيطها بدون تنفيذ دورة الاستخراج الكاملة؛ مناسب كبداية لفهم الملف.</p>
 
 ```text
 --config
@@ -3591,7 +3413,6 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-diagnose"></a>
 ## `diagnose`
 
-<p dir="rtl" align="right">يحوّل نتائج التحليل إلى ملاحظات واقتراحات Parameters مبنية على قياسات الصفحة، لمساعدة المطوّر في اختيار نقطة بداية للضبط.</p>
 
 ```text
 --config
@@ -3605,7 +3426,6 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-extract"></a>
 ## `extract`
 
-<p dir="rtl" align="right">ينفّذ دورة الاستخراج الفعلية ويولّد المخرجات المطلوبة مثل Excel والـ crops والـ manifests والـ run config حسب وضع الإخراج.</p>
 
 ```text
 --config
@@ -3623,7 +3443,6 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-inspect-config"></a>
 ## `inspect-config`
 
-<p dir="rtl" align="right">يعرض قيمة Parameter محدد ومرجعه من <code>parameter_catalog.yaml</code> حتى تعرف معناه قبل تغييره.</p>
 
 ```text
 --config
@@ -3635,7 +3454,6 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-9-tune"></a>
 ## `tune`
 
-<p dir="rtl" align="right">يختبر عدة قيم لباراميتر واحد على صفحة محددة ويرتب النتائج باستخدام Score يجمع مؤشرات هيكلية وOCR وValidation.</p>
 
 ```text
 --config
@@ -3653,7 +3471,6 @@ Use validation as a **detector of structural/OCR problems**, not as a way to hid
 <a id="toc-10-output-modes"></a>
 # 10. Output modes — do not confuse them
 
-<p dir="rtl" align="right">يشرح أوضاع الإخراج المختلفة وما الذي يولده كل Mode. راجع هذا القسم عندما تتوقع Excel أو crops ولا تجدها، قبل اعتبار ذلك خطأ في الاستخراج.</p>
 
 | Mode | Excel | Cell crops | Row crops | Training labels | Character recognition? | Detection-only text boxes? |
 |---|---:|---:|---:|---:|---:|---:|
@@ -3672,7 +3489,6 @@ Important: crop-only modes first use native/OpenCV geometry. Only when that prod
 <a id="toc-11-parameter-reference"></a>
 # 11. Parameter reference — every key in the current `configs/default.yaml`
 
-<p dir="rtl" align="right">المرجع الشامل لجميع Parameters الموجودة حاليًا في <code>configs/default.yaml</code>: وظيفة كل قيمة، متى تعدلها، وما الأعراض التي تشير إلى أنها تحتاج تغييرًا.</p>
 
 This appendix mirrors the current default YAML, including the v3.2 visual-structure and detection-only controls, so parameter names/defaults can be checked directly against the generated run-config JSON. Numeric values are not universally range-validated by the code; the "values" column states the safe/meaningful domain supported by the current implementation.
 
@@ -3999,7 +3815,6 @@ This appendix mirrors the current default YAML, including the v3.2 visual-struct
 <a id="toc-11-runtime-supported"></a>
 ## Runtime-supported keys not present in default YAML
 
-<p dir="rtl" align="right">قيم يستطيع الكود التعامل معها وقت التشغيل لكنها ليست مكتوبة افتراضيًا في <code>default.yaml</code>. استخدمها فقط عندما تكون الحالة المطلوبة واضحة ومذكورة هنا.</p>
 
 | Parameter | Status | Use |
 |---|---|---|
@@ -4013,7 +3828,6 @@ This appendix mirrors the current default YAML, including the v3.2 visual-struct
 <a id="toc-12-parameter-principles"></a>
 # 12. Parameter-selection principles
 
-<p dir="rtl" align="right">قواعد اختيار وتعديل الـ Parameters بطريقة منهجية: غيّر أقل عدد ممكن من القيم، استخدم القياسات والـ debug، وثبّت القيم الناجحة بدل التخمين.</p>
 
 1. **Ratios survive DPI changes better than pixel values.** If you raise render DPI from 400 to 500 (+25%), revisit pixel gaps/padding/morphology values; ratio parameters generally do not need the same scaling.
 2. **Tune one parameter at a time.** Otherwise you cannot tell which change fixed or broke the page.
@@ -4031,7 +3845,6 @@ This appendix mirrors the current default YAML, including the v3.2 visual-struct
 <a id="toc-13-release-checklist"></a>
 # 13. Recommended team release checklist
 
-<p dir="rtl" align="right">قائمة تحقق قبل تسليم نسخة جديدة للفريق أو اعتمادها: اختبارات، Smoke tests، توافق الإعدادات، المخرجات، التوثيق، وعدم كسر السلوك العام للمشروع.</p>
 
 Before calling a configuration "done" for a PDF family/template group:
 
@@ -4058,7 +3871,6 @@ Before calling a configuration "done" for a PDF family/template group:
 <a id="toc-14-known-limitations"></a>
 # 14. Known limitations to communicate during handoff
 
-<p dir="rtl" align="right">قائمة القيود المعروفة حاليًا التي يجب إبلاغ أي مطوّر بها حتى لا يضيع وقتًا في البحث عن Parameter غير موجود أو يفترض أن ميزة غير مطبقة تعمل بالفعل.</p>
 
 The current pipeline is strong as a generic page-adaptive foundation, but the handoff should not claim features that are not yet present:
 
@@ -4083,7 +3895,6 @@ These are not reasons to abandon the current architecture; they are explicit bou
 <a id="toc-15-validated-baseline"></a>
 # 15. Validated baseline (2026-08-18) and the protocol for every new PDF
 
-<p dir="rtl" align="right">هذا القسم يسجل آخر نقطة مستقرة وصل إليها المشروع فعليًا بعد الاختبارات، ويوضح بالضبط ما تم إصلاحه ولماذا، ثم يحدد طريقة بدء أي PDF جديد بدون كسر الـ baseline أو تحويل النظام إلى Template خاص بملف واحد.</p>
 
 ## 15.1 What is considered the current baseline?
 
